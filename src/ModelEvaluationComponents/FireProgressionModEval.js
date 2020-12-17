@@ -257,7 +257,7 @@ class FireProgressionModEval extends React.Component{
                 <hr/>
                 <div>
                     {
-                        this.state.currentView === 'Actual'?
+                        this.state.currentView === 'Prediction'?
                         <div>
                             <h3>Fire Spread Ground Truth:</h3>
                             <br/>
