@@ -42,6 +42,12 @@ class MyNavbar extends React.Component{
                         <Link className='list-group-item list-group-item-action bg-light' to="/detection">Fire Detection</Link>
                     }
                     {
+                        url.includes('imageDetection')?
+                        <Link className='list-group-item list-group-item-action bg-light' to="/imageDetection" style={{borderRight:'10px solid #3d3d3d'}}>Fire Detection 2</Link>
+                        :
+                        <Link className='list-group-item list-group-item-action bg-light' to="/imageDetection">Fire Detection 2</Link>
+                    }
+                    {
                         url.includes('progression')?
                         <Link className='list-group-item list-group-item-action bg-light' to="/progression" style={{borderRight:'10px solid #3d3d3d'}}>Fire Progression</Link>
                         :
