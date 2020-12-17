@@ -29,14 +29,14 @@ class FireDetectionModEval extends React.Component{
             endDate: null,
             summaryData: {
                 'Satellite Image Source': 'Landsat 8',
-                'Tensorflow Model Version': 'Faster RCNN - Resnet 50 v2.1',
+                'Tensorflow Model Version': 'Faster RCNN v2.1',
                 'Fire  Detected': 'YES',
                 'Confidence Level': '97%',
             },
         }
 
         this.formatDate = this.formatDate.bind(this);
-        this.getData = this.getData.bind(this);
+        this.getData2 = this.getData2.bind(this);
         this.getNOAAdata = this.getNOAAdata.bind(this);
         this.handleViewChange = this.handleViewChange.bind(this);
         this.toggleFilterDivModEval = this.toggleFilterDivModEval.bind(this);
@@ -91,91 +91,14 @@ class FireDetectionModEval extends React.Component{
         return [year, month, day].join('-');
     }
 
-    getData(){
-        var startDate = document.getElementById('startDateInput').value;
-        var endDate = document.getElementById('endDateInput').value;
-
-        var today = new Date();
-        today = this.formatDate(today);
-
-        if(startDate > today || startDate > today || endDate > today || endDate > today){
-            alert("Can't pick future dates.");
-            return;
-        }
-
-        if(startDate > endDate){
-            alert('Start date must be before end date.');
-            return;
-        }
-
-        if(startDate === '' || endDate === ''){
-            alert('Please select a start and end date');
-            return;
-        }
-
-        if(this.state.source === 'NOAA'){
-            this.getNOAAdata(startDate, endDate);
-        }
+    getData2(){
+        <div style={{width:'100%', height:'50px'}}>
+            console.log("getData2")
+            <img src={process.env.PUBLIC_URL + 'images/fireDetection_San_Diego.png'} alt='fire' width='60%' style={{margin:'20px 0'}}/>
+        </div>
     }
 
     getNOAAdata(start, end){
-        fetch(prodUrl + '/api/getNOAAdata', {
-            method:'POST',
-            body: JSON.stringify({
-                startDate: start,
-                endDate: end,
-                county: this.state.currentCounty,
-            })
-        })
-        .then(res => res.json())
-        .then(response => {
-            var rawData = response['rawData'];
-            var weatherStationData = response['weatherStationData']
-            weatherStationData = JSON.parse(weatherStationData)
-            weatherStationData = weatherStationData['results'];
-
-            // console.log(weatherStationData);
-
-            this.setState({
-                weatherStationData: weatherStationData,
-            })
-
-            var parsedData = JSON.parse(rawData);
-
-            var cols = [];
-            var rows = [];
-        
-            for(const key in parsedData){
-                var newColEntry = {
-                    label: key,
-                    field: key,
-                    sort: 'asc',
-                    width: 150,
-                }
-                cols.push(newColEntry);
-            }
-
-            for(var i=0; i<Object.keys(parsedData['DATE']).length; i++){      
-                var newRowEntry = {}
-                for(const key in parsedData){
-                    var val = parsedData[key][i];
-                    if (val == null){
-                        val = ''
-                    }
-                    newRowEntry[key] = val
-                }
-                rows.push(newRowEntry);
-            }
-
-            var data = {
-                columns: cols,
-                rows: rows,
-            }
-
-            this.setState({
-                data: data,
-            })
-        })
     }
 
     handleViewChange(event){
@@ -235,7 +158,7 @@ class FireDetectionModEval extends React.Component{
                 <FilterDivModEval 
                     pageType='dataAnalysis'
                     dataType='fireDetection'
-                    getData={this.getData}
+                    getData2={this.getData2}
                     changeCounty={this.changeCounty}
                     toggleFilterDivModEval={this.toggleFilterDivModEval}
                     currentView={this.state.currentView}
@@ -269,56 +192,14 @@ class FireDetectionModEval extends React.Component{
                             </div>
                             <hr/>
 
-                            <img src={process.env.PUBLIC_URL + 'images/fireDetection_San_Diego.png'} alt='fire' width='60%' style={{margin:'20px 0'}}/>
-                            <img src={process.env.PUBLIC_URL + 'images/detMod_1.png'} alt='fire2' width='50%' style={{margin:'20px 0'}} />
-                            <img src={process.env.PUBLIC_URL + 'images/detMod_2.png'} alt='fire3' width='50%' style={{margin:'20px 0'}} />
+                            <img src={process.env.PUBLIC_URL + 'images/fireDetection_San_Diego.png'} alt='fire' width='45%' style={{margin:'20px 0'}}/>
+                            <img src={process.env.PUBLIC_URL + 'images/fire-prediction.png'} alt='fire' width='30%' style={{margin:'20px 0'}}/>
+                            <img src={process.env.PUBLIC_URL + 'images/fire-precision-recall.png'} alt='fire' width='70%' style={{margin:'20px 0'}}/>
                         </div>
                         :
                         <div>
-                            <Map style={{height:'calc(100vh - 200px)', width:'calc(100vw - 600px)', border:'1px solid black', float:'left'}} zoom={6} center={[this.state.lat, this.state.lon]}>
-                                <LayersControl position="topright">
-
-                                    <LayersControl.BaseLayer name="Topology" checked>
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.BaseLayer name="Street">
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.BaseLayer name="Satellite">
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.BaseLayer name="Terrain">
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.BaseLayer name="Dark">
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.Overlay name="Show Counties" >
-                                        <GeoJSON data={counties.features}  style={countyStyle} onEachFeature={this.onEachCounty}/>
-                                    </LayersControl.Overlay>
-
-                                </LayersControl>
-                            </Map>
+                            <img src={process.env.PUBLIC_URL + 'images/detMod_1.png'} alt='fire2' width='70%' style={{margin:'20px 0'}} />
+                            <img src={process.env.PUBLIC_URL + 'images/detMod_2.png'} alt='fire3' width='70%' style={{margin:'20px 0'}} />
 
                             <div style={{float:'right', padding:'6px', width:'230px'}}>
                             {

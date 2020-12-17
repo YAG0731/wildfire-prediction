@@ -30,9 +30,6 @@ class FilterDivModEval extends React.Component{
                             this.props.dataType === 'fireRiskPrediction'?
                             'Fire Risk Prediction'
                             :
-                            this.props.dataType === 'landCover'?
-                            'Land Cover'
-                            :
                             this.props.dataType === 'fireProgression'?
                             'Fire Progression'
                             :
@@ -49,15 +46,21 @@ class FilterDivModEval extends React.Component{
                         :
                         this.props.pageType === 'dataAnalysis'?
                             this.props.currentView === 'Statistic View'?
-                            <button className='btn btn-success' onClick={this.props.handleViewChange} style={{float:'right', margin:'0 0 0 10px'}} >Map View</button>
+                            <button className='btn btn-success' onClick={this.props.handleViewChange} style={{float:'right', margin:'0 0 0 10px'}} >Graph View</button>
                             :
                             <button className='btn btn-success' onClick={this.props.handleViewChange} style={{float:'right', margin:'0 0 0 10px'}} >Statistic View</button>
+                        :
+                        this.props.pageType === 'actualPrediction'?
+                            this.props.currentView === 'Actual'?
+                            <button className='btn btn-success' onClick={this.props.handleViewChange} style={{float:'right', margin:'0 0 0 10px'}} >Prediction</button>
+                            :
+                            <button className='btn btn-success' onClick={this.props.handleViewChange} style={{float:'right', margin:'0 0 0 10px'}} >Actual</button>
                         :
                         <div></div>
                     }
 
                     <button className='btn btn-dark' style={{float:'right'}} onClick={this.props.toggleFilterDivModEval}>
-                        Filter 
+                        Select 
                         &nbsp;
                         <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-filter" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                             <path fillRule="evenodd" d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
@@ -73,32 +76,57 @@ class FilterDivModEval extends React.Component{
                             {
                                 this.props.dataType === 'fireDetection'?
                                 <select id="dataSourceInput" style={{padding:'14px'}}>
-                                    <option value='NOAA'>NOAA</option>
+                                    <option value='Landsat 8'>Landsat 8</option>
+                                    <option value='GOES 16/17'>GOES 16/17</option>
+                                    <option value='MODIS/TERRA'>MODIS/TERRA</option>
                                 </select>
                                 :
-                                this.props.dataType === 'RiskPrediction'?
+                                this.props.dataType === 'fireRiskPrediction'?
                                 <select id="dataSourceInput" style={{padding:'14px'}}>
-                                    <option value='USDA'>USDA</option>
-                                </select>
-                                :
-                                this.props.dataType === 'landCover'?
-                                <select id="dataSourceInput" style={{padding:'14px'}}>
-                                    <option value='USGS'>USGS</option>
+                                    <option value='Weather Fire-History'>Weather Fire-History</option>
+                                    <option value='Remote-Sensing Fire-History'>Remote-Sensing Fire-History</option>
                                 </select>
                                 :
                                 this.props.dataType === 'fireProgression'?
                                 <select id="dataSourceInput" style={{padding:'14px'}}>
-                                    <option value='USGS'>USGS</option>
+                                    <option value='Fire History'>Fire History</option>
+                                    <option value='Remote Sensing'>Remote Sensing</option>
+                                    <option value='Land Cover'>Land Cover</option>
+                                    <option value='Waeather'>Weather</option>
                                 </select>
                                 :
                                 <div></div>
                             }
                         </div>
                         <div style={{float:'right'}}>
-                            From:&nbsp;
-                            <input type='date' style={{padding:'10px'}} id="startDateInput" onChange={this.changeStartDate}/>
-                            &nbsp; - &nbsp;
-                            <input type='date' style={{padding:'10px'}} id='endDateInput' onChange={this.changeEndDate}/>
+                            Location:&nbsp;
+                            {
+                                this.props.dataType === 'fireDetection'?
+                                <select id="dataSourceInput" style={{padding:'14px'}}>
+                                    <option value='San Diego 8/8/2018'>San Diego 8/8/2018</option>
+                                    <option value='Sonoma 2017'>Sonoma 2017</option>
+                                    <option value='SCU Lightning 2020'>SCU Lightning 2020</option>
+                                    <option value='August Complex 2020'>August Complex 2020</option>
+                                </select>
+                                :
+                                this.props.dataType === 'fireRiskPrediction'?
+                                <select id="dataSourceInput" style={{padding:'14px'}}>
+                                    <option value='San Diego 8/8/2018'>San Diego 8/8/2018</option>
+                                    <option value='Sonoma 2017'>Sonoma 2017</option>
+                                    <option value='SCU Lightning 2020'>SCU Lightning 2020</option>
+                                    <option value='August Complex 2020'>August Complex 2020</option>
+                                </select>
+                                :
+                                this.props.dataType === 'fireProgression'?
+                                <select id="dataSourceInput" style={{padding:'14px'}}>
+                                    <option value='San Diego 8/8/2018'>San Diego 8/8/2018</option>
+                                    <option value='Sonoma 2017'>Sonoma 2017</option>
+                                    <option value='SCU Lightning 2020'>SCU Lightning 2020</option>
+                                    <option value='August Complex 2020'>August Complex 2020</option>
+                                </select>
+                                :
+                                <div></div>
+                            }
                             &nbsp;&nbsp;&nbsp;&nbsp;
                         </div>
                         <br/>
@@ -107,10 +135,35 @@ class FilterDivModEval extends React.Component{
                     </div>
                     <div style={{width:'100%'}}>
                         <div style={{float:'left'}}>
-                            County: &nbsp;&nbsp;
-                            <CountySelector parentCallback={this.props.changeCounty}/>
+                            Model: &nbsp;&nbsp;&nbsp;&nbsp;
+                            {
+                                this.props.dataType === 'fireDetection'?
+                                <select id="dataSourceInput" style={{padding:'14px'}}>
+                                    <option value='Faster RCNN'>Faster RCNN</option>
+                                    <option value='Efficient Net'>Efficient Net</option>
+                                    <option value='Retina Net'>Retina Net</option>
+                                </select>
+                                :
+                                this.props.dataType === 'fireRiskPrediction'?
+                                <select id="dataSourceInput" style={{padding:'14px'}}>
+                                    <option value='SVM'>SVM</option>
+                                    <option value='XGBoost'>XGBoost</option>
+                                    <option value='Random Forest'>Random Forest</option>
+                                    <option value='Multi Layer Perceptron'>Multi Layer Perceptron</option>
+                                    <option value='CNN'>CNN</option>
+                                </select>
+                                :
+                                this.props.dataType === 'fireProgression'?
+                                <select id="dataSourceInput" style={{padding:'14px'}}>
+                                    <option value='Value Iteration'>Value Iteration</option>
+                                    <option value='DQN'>DQN</option>
+                                    <option value='Policy Gradient'>Policy Gradient</option>
+                                </select>
+                                :
+                                <div></div>
+                            }
                         </div>
-                        <button className='btn btn-primary' onClick={this.props.getData} style={{float:'right', marginRight:'16px'}}>Get Data</button>
+                        <button className='btn btn-primary' onClick={this.props.getData2} style={{float:'right', marginRight:'16px'}}>Evaluate Model</button>
                     </div>
                     <br/>
                     <br/>

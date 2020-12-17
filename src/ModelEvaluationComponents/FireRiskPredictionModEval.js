@@ -275,19 +275,16 @@ class FireRiskPredictionModEval extends React.Component{
                             <h4>1 - SVM </h4>
                             <br/>
                             <img src={process.env.PUBLIC_URL + 'images/svm1.png'} alt='svm1' width='60%' style={{margin:'20px 0'}}/>
-                            <img src={process.env.PUBLIC_URL + 'images/svm2.png'} alt='svm2' width='60%' style={{margin:'20px 0'}}/>
 
                             <hr/>
                             <h4>2 - XGBoost </h4>
                             <br/>
                             <img src={process.env.PUBLIC_URL + 'images/xg1.png'} alt='svm1' width='60%' style={{margin:'20px 0'}}/>
-                            <img src={process.env.PUBLIC_URL + 'images/xg2.png'} alt='svm2' width='60%' style={{margin:'20px 0'}}/>
 
                             <hr/>
                             <h4>3 - Random Forest </h4>
                             <br/>
                             <img src={process.env.PUBLIC_URL + 'images/rf1.png'} alt='svm1' width='60%' style={{margin:'20px 0'}}/>
-                            <img src={process.env.PUBLIC_URL + 'images/rf2.png'} alt='svm2' width='60%' style={{margin:'20px 0'}}/>
 
                             <hr/>
                             <hr/>
@@ -309,65 +306,47 @@ class FireRiskPredictionModEval extends React.Component{
                                 }
                             </div>
                             <hr/>
+                            <h3>Evaluation - Remote Sensing Model:</h3>
+                            <br/>
+                            <hr/>
                             <h4>1 - CNN </h4>
                             <br/>
                             <img src={process.env.PUBLIC_URL + 'images/cnn1.png'} alt='svm1' width='60%' style={{margin:'20px 0'}}/>
-                            <img src={process.env.PUBLIC_URL + 'images/cnn2.png'} alt='svm2' width='60%' style={{margin:'20px 0'}}/>
 
                             <hr/>
                             <h4>2 - MultiLayer Perceptron </h4>
                             <br/>
                             <img src={process.env.PUBLIC_URL + 'images/mlp1.png'} alt='svm1' width='60%' style={{margin:'20px 0'}}/>
-                            <img src={process.env.PUBLIC_URL + 'images/mlp2.png'} alt='svm2' width='60%' style={{margin:'20px 0'}}/>
 
 
                         </div>
                         :
                         <div>
-                            <Map style={{height:'calc(100vh - 200px)', width:'calc(100vw - 600px)', border:'1px solid black', float:'left'}} zoom={6} center={[this.state.lat, this.state.lon]}>
-                                <LayersControl position="topright">
-
-                                    <LayersControl.BaseLayer name="Topology" checked>
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.BaseLayer name="Street">
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.BaseLayer name="Satellite">
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.BaseLayer name="Terrain">
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.BaseLayer name="Dark">
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.Overlay name="Show Counties" >
-                                        <GeoJSON data={counties.features}  style={countyStyle} onEachFeature={this.onEachCounty}/>
-                                    </LayersControl.Overlay>
-
-                                </LayersControl>
-                            </Map>
+                            <h3>Evaluation - Weather Model:</h3>
+                            <br/>
+                            <hr/>
+                            <h4>1 - SVM </h4>
+                            <br/>
+                            <img src={process.env.PUBLIC_URL + 'images/svm2.png'} alt='svm2' width='60%' style={{margin:'20px 0'}}/>
+                            <hr/>
+                            <h4>2 - XGBoost </h4>
+                            <br/>
+                            <img src={process.env.PUBLIC_URL + 'images/xg2.png'} alt='svm2' width='60%' style={{margin:'20px 0'}}/>
+                            <hr/>
+                            <h4>3 - Random Forest </h4>
+                            <br/>
+                            <img src={process.env.PUBLIC_URL + 'images/rf2.png'} alt='svm2' width='60%' style={{margin:'20px 0'}}/>
+                            <hr/>
+                            <hr/>
+                            <h3>Evaluation - Remote Sensing Model:</h3>
+                            <br/>
+                            <hr/>
+                            <h4>1 - CNN </h4>
+                            <br/>
+                            <img src={process.env.PUBLIC_URL + 'images/cnn2.png'} alt='svm2' width='60%' style={{margin:'20px 0'}}/>
+                            <hr/>
+                            <h4>2 - MultiLayer Perceptron </h4>
+                            <img src={process.env.PUBLIC_URL + 'images/mlp2.png'} alt='svm2' width='60%' style={{margin:'20px 0'}}/>
 
                             <div style={{float:'right', padding:'6px', width:'230px'}}>
                             {

@@ -240,7 +240,7 @@ class FireProgressionModEval extends React.Component{
             <div className="jumbotron" style={{margin:'10px 0 50px 0', paddingTop:'20px', overflow:'auto'}}>
 
                 <FilterDivModEval 
-                    pageType='dataAnalysis'
+                    pageType='actualPrediction'
                     dataType='fireProgression'
                     getData={this.getData}
                     changeCounty={this.changeCounty}
@@ -257,7 +257,7 @@ class FireProgressionModEval extends React.Component{
                 <hr/>
                 <div>
                     {
-                        this.state.currentView === 'Statistic View'?
+                        this.state.currentView === 'Actual'?
                         <div>
                             <h3>Fire Spread Ground Truth:</h3>
                             <br/>
@@ -279,60 +279,18 @@ class FireProgressionModEval extends React.Component{
                             <img src='http://worldlywise.pbworks.com/f/1274641471/All_3D.gif' alt='fire' width='60%' style={{margin:'20px 0'}}/>
 
                             <hr/>
+                            <br/>
+                        </div>
+                        :
+                        <div>
                             <hr/>
                             <h3>Predicted Fire Progression:</h3>
                             <hr/>
                             <img src={process.env.PUBLIC_URL + 'images/spread.gif'} alt='spread2' width='60%' style={{margin:'20px 0'}}/>
 
                             <hr/>
-                            <br/>
-                        </div>
-                        :
-                        <div>
-                            <Map style={{height:'calc(100vh - 200px)', width:'calc(100vw - 600px)', border:'1px solid black', float:'left'}} zoom={6} center={[this.state.lat, this.state.lon]}>
-                                <LayersControl position="topright">
 
-                                    <LayersControl.BaseLayer name="Topology" checked>
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
 
-                                    <LayersControl.BaseLayer name="Street">
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.BaseLayer name="Satellite">
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.BaseLayer name="Terrain">
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.BaseLayer name="Dark">
-                                        <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
-                                        />
-                                    </LayersControl.BaseLayer>
-
-                                    <LayersControl.Overlay name="Show Counties" >
-                                        <GeoJSON data={counties.features}  style={countyStyle} onEachFeature={this.onEachCounty}/>
-                                    </LayersControl.Overlay>
-
-                                </LayersControl>
-                            </Map>
 
                             <div style={{float:'right', padding:'6px', width:'230px'}}>
                             {

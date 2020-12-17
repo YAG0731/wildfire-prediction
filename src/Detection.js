@@ -28,22 +28,22 @@ class Detection extends React.Component{
 
         this.redDotIcon = L.icon({
             iconUrl: require('./images/redDot.svg'),
-            iconSize: [32,32],
+            iconSize: [32,32]
         });
 
         this.orangeDotIcon = L.icon({
             iconUrl: require('./images/orangeDot.svg'),
-            iconSize: [32,32],
+            iconSize: [32,32]
         });
 
         this.greenDotIcon = L.icon({
             iconUrl: require('./images/greenDot.svg'),
-            iconSize: [32,32],
+            iconSize: [32,32]
         });
 
         this.blueDotIcon = L.icon({
             iconUrl: require('./images/blueDot.svg'),
-            iconSize: [32,32],
+            iconSize: [32,32]
         });
     }
 
@@ -83,6 +83,7 @@ class Detection extends React.Component{
         Object.keys(fires).map((key) => {
             fireMarkers.push(
                 <Marker position={[fires[key]['latitude'], fires[key]['longitude']]} onclick={this.handleFireSelect} key={key} acres={20}
+                //icon = {this.redDotIcon}>
                 icon = {this.redDotIcon}>
                     <Popup>
                         <h5>{fires[key]['name']}</h5>

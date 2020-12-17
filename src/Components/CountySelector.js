@@ -5,7 +5,7 @@ class CountySelector extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            currentCounty: 'Santa Clara County'
+            currentValue: 'Santa Clara'
         }
 
         this.handleCountyChange = this.handleCountyChange.bind(this);
