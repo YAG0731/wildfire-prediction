@@ -4,7 +4,6 @@ import 'leaflet/dist/leaflet.css';
 import counties from './counties.json';
 import L from 'leaflet';
 import MyNavbar from './Components/MyNavbar';
-import {SanDiegoFireData} from './DetectionComponents/SanDiegoFireData'
 import CaFireData from './DetectionComponents/fire_history_ca.json'
 
 class Detection extends React.Component{
