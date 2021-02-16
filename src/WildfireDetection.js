@@ -23,7 +23,7 @@ class WildfireDetection extends React.Component {
       area: 'North California',
       imageColor: 'True Color Composite',
       date: null,
-      loading: true,
+      gotInputImage: false,
     };
 
     this.getFile = this.getFile.bind(this)
@@ -47,9 +47,8 @@ class WildfireDetection extends React.Component {
 
   async getFile(){
     this.setState({
-      loading: true,
+      gotInputImage: false
     })
-
     var url = 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&&CRS=EPSG:4326&WRAP=DAY&LAYERS='    
     var height = 800
     if(this.state.imageColor === 'True Color Composite'){
@@ -77,7 +76,7 @@ class WildfireDetection extends React.Component {
     this.setState({
       selectedFile: file,
       inputFileUrl: url,
-      loading: false
+      gotInputImage: true
     })
   }
 
@@ -307,7 +306,7 @@ class WildfireDetection extends React.Component {
                   <br/>
 
                   {
-                    this.state.loading === true?
+                    this.state.gotInputImage === false?
                     <div>Loading...</div>
                     :
                     <img src={this.state.inputFileUrl} width='100%' />
