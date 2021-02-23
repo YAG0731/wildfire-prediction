@@ -1,13 +1,20 @@
 import React from 'react';
 import CountySelector from './CountySelector';
+import WrccStationSelector from './WrccStationSelector';
 
 class FilterDiv extends React.Component{
 
     constructor(props){
         super(props);
 
+        this.state = {
+            dataSource: 'NOAA'
+        }
+
         this.changeStartDate = this.changeStartDate.bind(this);
         this.changeEndDate = this.changeEndDate.bind(this);
+        this.changeSource = this.changeSource.bind(this);
+        this.changeWrccStation = this.changeWrccStation.bind(this);
     }
 
     changeStartDate(event){
@@ -16,6 +23,17 @@ class FilterDiv extends React.Component{
 
     changeEndDate(event){
         this.props.handleEndDateChange(event.target.value);
+    }
+
+    changeSource(event){
+        this.setState({
+            dataSource: event.target.value
+        })
+        this.props.handleSourceChange(event.target.value);
+    }
+
+    changeWrccStation(station){
+        this.props.handleWrccStationChange(station);
     }
     
     render(){
@@ -72,8 +90,9 @@ class FilterDiv extends React.Component{
                             Source: &nbsp;&nbsp;
                             {
                                 this.props.dataType === 'weather'?
-                                <select id="dataSourceInput" style={{padding:'14px'}}>
+                                <select id="dataSourceInput" style={{padding:'14px'}} onChange={this.changeSource}>
                                     <option value='NOAA'>NOAA</option>
+                                    <option value='WRCC'>WRCC</option>
                                 </select>
                                 :
                                 this.props.dataType === 'fireHistory'?
@@ -94,7 +113,27 @@ class FilterDiv extends React.Component{
                                 <div></div>
                             }
                         </div>
-                        <div style={{float:'right'}}>
+                        {
+                            this.state.dataSource == 'WRCC'?
+                            <div>
+                                <WrccStationSelector handleChange={this.changeWrccStation}/>
+                            </div>
+                            :
+                            <div>
+                                <div style={{float:'right'}}>
+                                    From:&nbsp;
+                                    <input type='date' style={{padding:'10px'}} id="startDateInput" onChange={this.changeStartDate}/>
+                                    &nbsp; - &nbsp;
+                                    <input type='date' style={{padding:'10px'}} id='endDateInput' onChange={this.changeEndDate}/>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                </div>
+                                <br/>
+                                <br/>
+                                <br/>
+                            </div>
+
+                        }
+                        {/* <div style={{float:'right'}}>
                             From:&nbsp;
                             <input type='date' style={{padding:'10px'}} id="startDateInput" onChange={this.changeStartDate}/>
                             &nbsp; - &nbsp;
@@ -103,16 +142,22 @@ class FilterDiv extends React.Component{
                         </div>
                         <br/>
                         <br/>
-                        <br/>
+                        <br/> */}
                     </div>
-                    <div style={{width:'100%'}}>
-                        <div style={{float:'left'}}>
-                            County: &nbsp;&nbsp;
-                            <CountySelector parentCallback={this.props.changeCounty}/>
+                    {
+                        this.state.dataSource == 'WRCC'?
+                        <div></div>
+                        :
+                        <div>
+                            <div style={{width:'100%'}}>
+                                <div style={{float:'left'}}>
+                                    County: &nbsp;&nbsp;
+                                    <CountySelector parentCallback={this.props.changeCounty}/>
+                                </div>
+                                <button className='btn btn-primary' onClick={this.props.getData} style={{float:'right', marginRight:'16px'}}>Get Data</button>
+                            </div>
                         </div>
-                        <button className='btn btn-primary' onClick={this.props.getData} style={{float:'right', marginRight:'16px'}}>Get Data</button>
-                    </div>
-                    <br/>
+                    }
                     <br/>
                     <br/>
                     <hr/>

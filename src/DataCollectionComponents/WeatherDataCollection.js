@@ -31,6 +31,10 @@ class WeatherDataCollection extends React.Component{
             weatherStationFeatures: ['datacoverage', 'elevation', 'elevationUnit', 'id', 'latitude', 'longitude', 'maxdate', 'mindate', 'name'],
             startDate: null,
             endDate: null,
+            day: null,
+            month: null,
+            year: null,
+            wrcc_station: 'cald',
 
         }
 
@@ -47,6 +51,8 @@ class WeatherDataCollection extends React.Component{
         this.getFeatureData = this.getFeatureData.bind(this);
         this.handleStartDateChange = this.handleStartDateChange.bind(this);
         this.handleEndDateChange = this.handleEndDateChange.bind(this);
+        this.handleSourceChange = this.handleSourceChange.bind(this);
+        this.handleWrccStationChange = this.handleWrccStationChange.bind(this);
     }
 
     componentDidMount(){
@@ -55,6 +61,18 @@ class WeatherDataCollection extends React.Component{
         var year = today.getFullYear();
         var month = today.getMonth();
         var day = today.getDate();
+
+        var temp_month = month
+        temp_month += 1
+        if(temp_month < 10){
+            temp_month = '0' + temp_month
+        }
+
+        this.setState({
+            day: day,
+            month: temp_month,
+            year: (year % 2000)
+        })
 
         var dd = String(today.getDate()).padStart(2, '0');
         var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -65,6 +83,7 @@ class WeatherDataCollection extends React.Component{
         if(month < 10){
             month = "0" + month;
         }
+
         if(day < 10){
             day = "0" + day;
         }
@@ -272,6 +291,18 @@ class WeatherDataCollection extends React.Component{
         })
     }
 
+    handleSourceChange(newSource){
+        this.setState({
+            source: newSource,
+        })
+    }
+
+    handleWrccStationChange(newStation){
+        this.setState({
+            wrcc_station: newStation,
+        })
+    }
+
     render(){
         delete L.Icon.Default.prototype._getIconUrl;
         L.Icon.Default.mergeOptions({
@@ -296,6 +327,10 @@ class WeatherDataCollection extends React.Component{
             tmax = this.getFeatureData('TMAX');
         }
 
+        var wrcc_url = 'https://wrcc.dri.edu/cgi-bin/wea_daysum2.pl?stn='+this.state.wrcc_station+'&day='+this.state.day+'&mon='+this.state.month+'&yea='+this.state.year+'&unit=E'
+
+        console.log(wrcc_url)
+
         return(
             <div className="jumbotron" style={{margin:'10px 0 50px 0', paddingTop:'20px', overflow:'auto'}}>
                 <FilterDiv 
@@ -308,52 +343,69 @@ class WeatherDataCollection extends React.Component{
                     handleViewChange={this.handleViewChange}
                     handleStartDateChange={this.handleStartDateChange}
                     handleEndDateChange={this.handleEndDateChange}
+                    handleSourceChange = {this.handleSourceChange}
+                    handleWrccStationChange = {this.handleWrccStationChange}
                 />
-                <p>
-                    <strong>Data for: </strong>{this.state.currentCounty} County ({this.state.startDate} to {this.state.endDate})
-                </p>
+                {
+                    this.state.source != 'WRCC'?
+                    <p>
+                        <strong>Data for: </strong>{this.state.currentCounty} County ({this.state.startDate} to {this.state.endDate})
+                    </p>
+                    :
+                    <div></div>
+                }
                 <div>
                     {
                         this.state.currentView === 'Table View'?
                         <div>
                             {
-                                !this.state.data?
-                                <div>Getting data...</div>
-                                :
+                                this.state.source == 'NOAA'?
                                 <div>
-                                    <MDBDataTable responsive
-                                    striped
-                                    bordered
-                                    data={this.state.data}
-                                    />
-                                    <br/>
-                                    <hr/>
+                                    {
+                                        !this.state.data?
+                                        <div>Getting data...</div>
+                                        :
+                                        <div>
+                                            <MDBDataTable responsive
+                                            striped
+                                            bordered
+                                            data={this.state.data}
+                                            />
+                                            <br/>
+                                            <hr/>
 
-                                    <h4>Graphs</h4>
-                                    <br/>
-                                    <Plot
-                                        style = {{height:'400px'}}
-                                        data = {tavg}
-                                        layout = {{showlegend: true, title:'TAVG over time'}}
-                                        config = {{responsive:true }}
-                                    />
-                                    <br/>
-                                    <Plot
-                                        style = {{ height:'400px'}}
-                                        data = {tmin}
-                                        layout = {{showlegend:true, title: 'TMIN over time' }}
-                                        config = {{responsive:true }}
-                                    />
-                                    <br/>
-                                    <Plot
-                                        style = {{height:'400px'}}
-                                        data = {tmax}
-                                        layout = {{showlegend:true, title:'TMAX over time' }}
-                                        config = {{responsive:true }}
-                                    />
-
+                                            <h4>Graphs</h4>
+                                            <br/>
+                                            <Plot
+                                                style = {{height:'400px'}}
+                                                data = {tavg}
+                                                layout = {{showlegend: true, title:'TAVG over time'}}
+                                                config = {{responsive:true }}
+                                            />
+                                            <br/>
+                                            <Plot
+                                                style = {{ height:'400px'}}
+                                                data = {tmin}
+                                                layout = {{showlegend:true, title: 'TMIN over time' }}
+                                                config = {{responsive:true }}
+                                            />
+                                            <br/>
+                                            <Plot
+                                                style = {{height:'400px'}}
+                                                data = {tmax}
+                                                layout = {{showlegend:true, title:'TMAX over time' }}
+                                                config = {{responsive:true }}
+                                            />
+                                        </div>
+                                    }
                                 </div>
-                                
+                                :
+                                this.state.source == 'WRCC'?
+                                <div>
+                                    <iframe src={wrcc_url} height='500px' width='100%' />
+                                </div>
+                                :
+                                <div></div>
                             }
                         </div>
                         :
