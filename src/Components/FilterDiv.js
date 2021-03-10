@@ -8,7 +8,7 @@ class FilterDiv extends React.Component{
         super(props);
 
         this.state = {
-            dataSource: 'NOAA'
+            dataSource: 'WRCC'
         }
 
         this.changeStartDate = this.changeStartDate.bind(this);
@@ -29,6 +29,7 @@ class FilterDiv extends React.Component{
         this.setState({
             dataSource: event.target.value
         })
+        // console.log('new source: ' + event.target.value)
         this.props.handleSourceChange(event.target.value);
     }
 
@@ -91,8 +92,8 @@ class FilterDiv extends React.Component{
                             {
                                 this.props.dataType === 'weather'?
                                 <select id="dataSourceInput" style={{padding:'14px'}} onChange={this.changeSource}>
-                                    <option value='NOAA'>NOAA</option>
                                     <option value='WRCC'>WRCC</option>
+                                    <option value='NOAA'>NOAA</option>
                                 </select>
                                 :
                                 this.props.dataType === 'fireHistory'?
@@ -156,10 +157,10 @@ class FilterDiv extends React.Component{
                                 </div>
                                 <button className='btn btn-primary' onClick={this.props.getData} style={{float:'right', marginRight:'16px'}}>Get Data</button>
                             </div>
+                            <br/>
+                            <br/>
                         </div>
                     }
-                    <br/>
-                    <br/>
                     <hr/>
                 </div>
             </div>

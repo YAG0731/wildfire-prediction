@@ -217,43 +217,12 @@ class Monitoring extends React.Component{
             fillOpacity: 0.3,
         }
 
-        var dotStyles = {
-            redDot: {
-                height: '14px',
-                width: '14px',
-                backgroundColor: '#FF5353',
-                borderRadius: '50%',
-                display: 'inline-block'
-            },
-            orangeDot: {
-                height: '14px',
-                width: '14px',
-                backgroundColor: '#FFBA53',
-                borderRadius: '50%',
-                display: 'inline-block'
-            },
-            greenDot: {
-                height: '14px',
-                width: '14px',
-                backgroundColor: '#44C37E',
-                borderRadius: '50%',
-                display: 'inline-block'
-            },
-            blueDot: {
-                height: '14px',
-                width: '14px',
-                backgroundColor: '#1092DC',
-                borderRadius: '50%',
-                display: 'inline-block'
-            }
-        }
-
-        delete L.Icon.Default.prototype._getIconUrl;
-        L.Icon.Default.mergeOptions({
-        iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-        iconUrl: require("leaflet/dist/images/marker-icon.png"),
-        shadowUrl: require("leaflet/dist/images/marker-shadow.png")
-        });
+        // delete L.Icon.Default.prototype._getIconUrl;
+        // L.Icon.Default.mergeOptions({
+        // iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+        // iconUrl: require("leaflet/dist/images/marker-icon.png"),
+        // shadowUrl: require("leaflet/dist/images/marker-shadow.png")
+        // });
 
         var header = null;
         {
@@ -356,12 +325,6 @@ class Monitoring extends React.Component{
                                         <LayersControl.Overlay name="Show Markers" checked>
                                             <FeatureGroup>
                                                 {fmarkers}
-                                            </FeatureGroup>
-                                        </LayersControl.Overlay>
-
-                                        <LayersControl.Overlay name='Show Legend' checked>
-                                            <FeatureGroup>
-
                                             </FeatureGroup>
                                         </LayersControl.Overlay>
                                         

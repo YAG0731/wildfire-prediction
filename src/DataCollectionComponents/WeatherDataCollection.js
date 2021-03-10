@@ -2,16 +2,22 @@ import React from 'react';
 import '../css/reactPaginationStyle.css';
 import { MDBDataTable } from 'mdbreact';
 // import CountySelector from '../Components/CountySelector';
-import {Map, TileLayer, LayersControl, Marker, Popup, GeoJSON} from 'react-leaflet';
+import {Map, TileLayer, LayersControl, Marker, Popup, GeoJSON, FeatureGroup} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import Plot from 'react-plotly.js';
 import FilterDiv from '../Components/FilterDiv';
 import counties from '../counties.json';
+import BlueDot from '../images/blueDot.svg';
 
 const devUrl = '';
 const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
+
+const myIcon = L.icon({
+    iconUrl: BlueDot,
+    iconSize: [28,28],
+});
 
 class WeatherDataCollection extends React.Component{
 
@@ -19,11 +25,11 @@ class WeatherDataCollection extends React.Component{
         super(props);
         
         this.state = {
-            source: 'NOAA',
+            source: 'WRCC',
             lat: props.lat,
             lon: props.lon,
             currentCounty: 'Alameda',
-            data: null,
+            noaaData: null,
             currentView: 'Table View',
             currentMarker: null,
             weatherStationData: null,
@@ -35,6 +41,7 @@ class WeatherDataCollection extends React.Component{
             month: null,
             year: null,
             wrcc_station: 'cald',
+            wrccData: null,
 
         }
 
@@ -48,15 +55,24 @@ class WeatherDataCollection extends React.Component{
         this.onCountyMouseout = this.onCountyMouseout.bind(this);
         this.onCountyMouseover = this.onCountyMouseover.bind(this);
         this.onEachCounty = this.onEachCounty.bind(this);
-        this.getFeatureData = this.getFeatureData.bind(this);
+        this.getNoaaFeatureData = this.getNoaaFeatureData.bind(this);
         this.handleStartDateChange = this.handleStartDateChange.bind(this);
         this.handleEndDateChange = this.handleEndDateChange.bind(this);
         this.handleSourceChange = this.handleSourceChange.bind(this);
         this.handleWrccStationChange = this.handleWrccStationChange.bind(this);
+        this.getWrccData = this.getWrccData.bind(this);
+        this.nextDay = this.nextDay.bind(this);
+        this.prevDay = this.prevDay.bind(this);
+        this.getWrccFeatureData = this.getWrccFeatureData.bind(this);
+        this.makeWrccStationMarkers = this.makeWrccStationMarkers.bind(this);
     }
 
     componentDidMount(){
         var today = new Date();
+        // console.log(today)
+        // console.log(today.getDate())
+        // console.log(today.getMonth())
+        // console.log(today.getFullYear())
 
         var year = today.getFullYear();
         var month = today.getMonth();
@@ -93,9 +109,7 @@ class WeatherDataCollection extends React.Component{
         this.setState({
             startDate: monthAgo,
             endDate: today,
-        })
-
-        this.getNOAAdata(monthAgo, today);
+        }, ()=>{this.getData()})
 
     }
 
@@ -116,8 +130,10 @@ class WeatherDataCollection extends React.Component{
 
 
     getData(){
-        var startDate = document.getElementById('startDateInput').value;
-        var endDate = document.getElementById('endDateInput').value;
+        // var startDate = document.getElementById('startDateInput').value;
+        // var endDate = document.getElementById('endDateInput').value;
+        var startDate = this.state.startDate;
+        var endDate = this.state.endDate;
 
         var today = new Date();
         today = this.formatDate(today);
@@ -137,14 +153,76 @@ class WeatherDataCollection extends React.Component{
             return;
         }
 
-        if(this.state.source === 'NOAA'){
+        if(this.state.source == 'NOAA'){
             this.getNOAAdata(startDate, endDate);
+        }
+        else if(this.state.source == 'WRCC'){
+            this.getWrccData();
         }
     }
 
+    getWrccData(){
+        console.log('getting data from WRCC')
+        var wrcc_url = 'https://wrcc.dri.edu/cgi-bin/wea_daysum2.pl?stn='+this.state.wrcc_station+'&day='+this.state.day+'&mon='+this.state.month+'&yea='+this.state.year+'&unit=E'
+
+        // console.log('date: '+this.state.day+'/'+this.state.month+'/'+this.state.year)
+
+        fetch('/api/getWrccData', {
+            method: 'POST',
+            body: JSON.stringify({
+                url: wrcc_url,
+            })
+        })
+        .then(res => res.json())
+        .then(response => {
+            // console.log(response)
+            var rows = response['rows']
+
+            var columnNames = [
+                'Hour','Total Solar Rad','Ave. mph', 'Wind V. Dir. Deg','Max mph','Air Temp Mean Deg. F','Fuel Temp Mean Deg. F.','Fuel Moisture Mean Percent','Relative Humidity Mean Percent','Dew Point Deg','Wet Buld F.','Total Percip. inches'
+            ]
+
+            var temp = [];
+            for(var i = 0; i<rows.length; i++){
+                var row = rows[i]
+                var newRowEntry = {}
+                for(var j = 0; j<columnNames.length; j++){
+                    var text = row[j].replace(/(\r\n|\n|\r)/gm, "");
+                    if(text == ''){
+                        text = ' '
+                    }
+                    newRowEntry[columnNames[j]] = text
+                }
+                temp.push(newRowEntry)
+            }
+
+            var cols = [];
+            for(var i=0; i<columnNames.length; i++){
+                var newColEntry = {
+                    label: columnNames[i],
+                    field: columnNames[i],
+                    sort: 'asc',
+                    width: 150,
+                }
+                cols.push(newColEntry);
+            }
+
+            var data = {
+                columns: cols,
+                rows: temp,
+            }
+
+            this.setState({
+                wrccData: data,
+            })
+
+        })
+    }
+
     getNOAAdata(start, end){
+        console.log('getting data from NOAA')
         this.setState({
-            data: null,
+            noaaData: null,
         })
 
         fetch(prodUrl + '/api/getNOAAdata', {
@@ -181,7 +259,7 @@ class WeatherDataCollection extends React.Component{
                 cols.push(newColEntry);
             }
 
-            console.log(parsedData);
+            // console.log(parsedData);
             if(parsedData['DATE'] != null){
                 for(var i=0; i<Object.keys(parsedData['DATE']).length; i++){      
                     var newRowEntry = {}
@@ -202,7 +280,7 @@ class WeatherDataCollection extends React.Component{
             }
 
             this.setState({
-                data: data,
+                noaaData: data,
             })
         })
     }
@@ -258,10 +336,10 @@ class WeatherDataCollection extends React.Component{
         })
     }
 
-    getFeatureData(feature){
+    getNoaaFeatureData(feature){
         var data = [];
         var temp = {};
-        for(var row of this.state.data['rows']){
+        for(var row of this.state.noaaData['rows']){
             if(!(row['STATION'] in temp)){
                 temp[row['STATION']] = {
                     'x': [],
@@ -294,22 +372,92 @@ class WeatherDataCollection extends React.Component{
     handleSourceChange(newSource){
         this.setState({
             source: newSource,
+        }, () => {
+            this.getData();
         })
     }
 
     handleWrccStationChange(newStation){
         this.setState({
             wrcc_station: newStation,
-        })
+        }, ()=>{this.getWrccData()})
+    }
+
+    nextDay(){
+        var currentDate = '20'+this.state.year + '-' + parseInt(this.state.month) + '-' + parseInt(this.state.day)
+        var d = new Date(currentDate)
+
+        d.setDate(d.getDate() + 1);
+
+        var year = d.getFullYear();
+        var month = d.getMonth();
+        var day = d.getDate()
+
+        var temp_month = month
+        temp_month += 1
+        if(temp_month < 10){
+            temp_month = '0' + temp_month
+        }
+
+        this.setState({
+            day: day,
+            month: temp_month,
+            year: (year % 2000)
+        }, ()=>{this.getWrccData()})
+
+    }
+
+    prevDay(){
+        var currentDate = '20'+this.state.year + '-' + parseInt(this.state.month) + '-' + parseInt(this.state.day)
+        var d = new Date(currentDate)
+
+        d.setDate(d.getDate() - 1);
+
+        var year = d.getFullYear();
+        var month = d.getMonth();
+        var day = d.getDate();
+
+        var temp_month = month
+        temp_month += 1
+        if(temp_month < 10){
+            temp_month = '0' + temp_month
+        }
+
+        this.setState({
+            day: day,
+            month: temp_month,
+            year: (year % 2000)
+        }, ()=>{this.getWrccData()})
+    }
+
+    getWrccFeatureData(feature){
+        var data = [{
+            'x': [],
+            'y': [],
+            type: 'line'
+        }]
+        for(var i=0; i<this.state.wrccData.rows.length; i++){
+            data[0]['y'].push(parseFloat(this.state.wrccData.rows[i][feature]))
+            data[0]['x'].push(this.state.wrccData.rows[i]['Hour'])
+        }
+        return data
+    }
+
+    makeWrccStationMarkers(){
+        var markers = []
+        for (const [key, value] of Object.entries(wrcc_station_locations)) {
+            var pos = [wrcc_station_locations[key]['lat'], wrcc_station_locations[key]['lon']]
+
+            markers.push(
+                <Marker position={pos} key={key} onClick={this.handleWrccStationChange.bind(this, key)} icon={myIcon}>
+
+                </Marker>
+            )
+        }
+        return markers
     }
 
     render(){
-        delete L.Icon.Default.prototype._getIconUrl;
-        L.Icon.Default.mergeOptions({
-            iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-            iconUrl: require('leaflet/dist/images/marker-icon.png'),
-            shadowUrl: require('leaflet/dist/images/marker-shadow.png')
-        });
 
         var countyStyle = {
             color: '#4a83ec',
@@ -318,18 +466,28 @@ class WeatherDataCollection extends React.Component{
             fillOpacity: 0.3,
         }
 
+        var wrccStationMarkers = this.makeWrccStationMarkers()
+
         var tavg = null;
         var tmin = null;
         var tmax = null;
-        if(this.state.data != null){
-            tavg = this.getFeatureData('TAVG');
-            tmin = this.getFeatureData('TMIN');
-            tmax = this.getFeatureData('TMAX');
+        if(this.state.noaaData != null){
+            tavg = this.getNoaaFeatureData('TAVG');
+            tmin = this.getNoaaFeatureData('TMIN');
+            tmax = this.getNoaaFeatureData('TMAX');
         }
 
-        var wrcc_url = 'https://wrcc.dri.edu/cgi-bin/wea_daysum2.pl?stn='+this.state.wrcc_station+'&day='+this.state.day+'&mon='+this.state.month+'&yea='+this.state.year+'&unit=E'
+        var wrcc_mph = null;
+        var wrcc_temp = null;
+        var wrcc_precip = null;
+        if(this.state.wrccData != null){
+            wrcc_mph = this.getWrccFeatureData('Ave. mph');
+            wrcc_temp = this.getWrccFeatureData('Air Temp Mean Deg. F')
+            wrcc_precip = this.getWrccFeatureData('Total Percip. inches')
+        }
+        // console.log(wrcc_temp)
 
-        console.log(wrcc_url)
+        var wrcc_url = 'https://wrcc.dri.edu/cgi-bin/wea_daysum2.pl?stn='+this.state.wrcc_station+'&day='+this.state.day+'&mon='+this.state.month+'&yea='+this.state.year+'&unit=E'
 
         return(
             <div className="jumbotron" style={{margin:'10px 0 50px 0', paddingTop:'20px', overflow:'auto'}}>
@@ -355,21 +513,21 @@ class WeatherDataCollection extends React.Component{
                     <div></div>
                 }
                 <div>
-                    {
-                        this.state.currentView === 'Table View'?
+                    {/* {
+                        this.state.currentView === 'Table View'? */}
                         <div>
                             {
                                 this.state.source == 'NOAA'?
                                 <div>
                                     {
-                                        !this.state.data?
+                                        !this.state.noaaData?
                                         <div>Getting data...</div>
                                         :
                                         <div>
                                             <MDBDataTable responsive
                                             striped
                                             bordered
-                                            data={this.state.data}
+                                            data={this.state.noaaData}
                                             />
                                             <br/>
                                             <hr/>
@@ -402,13 +560,133 @@ class WeatherDataCollection extends React.Component{
                                 :
                                 this.state.source == 'WRCC'?
                                 <div>
-                                    <iframe src={wrcc_url} height='500px' width='100%' />
+                                    {/* <iframe src={wrcc_url} height='500px' width='100%' /> */}
+                                    {
+                                        !this.state.wrccData?
+                                        <div>Getting data...</div>
+                                        :
+                                        <div>
+                                            <h5>{wrccStations[this.state.wrcc_station]} - {this.state.day}/{this.state.month}/{this.state.year} <span style={{color:'grey'}}>(d/m/y)</span></h5>
+                                            <br/>
+
+                                            {
+                                                this.state.currentView == 'Map View'?
+                                                <div>
+                                                    <Map style={{height:'300px', width:'calc(100vw - 600px)', border:'1px solid black', float:'left'}} zoom={5} center={[this.state.lat, this.state.lon]}>
+                                                        <LayersControl position="topright">
+
+                                                            <LayersControl.BaseLayer name="Topology" checked>
+                                                                <TileLayer
+                                                                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                                                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.png"
+                                                                />
+                                                            </LayersControl.BaseLayer>
+
+                                                            <LayersControl.BaseLayer name="Street">
+                                                                <TileLayer
+                                                                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                                                />
+                                                            </LayersControl.BaseLayer>
+
+                                                            <LayersControl.BaseLayer name="Satellite">
+                                                                <TileLayer
+                                                                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                                                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png"
+                                                                />
+                                                            </LayersControl.BaseLayer>
+
+                                                            <LayersControl.BaseLayer name="Terrain">
+                                                                <TileLayer
+                                                                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                                                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}.png"
+                                                                />
+                                                            </LayersControl.BaseLayer>
+
+                                                            <LayersControl.BaseLayer name="Dark">
+                                                                <TileLayer
+                                                                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                                                url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
+                                                                />
+                                                            </LayersControl.BaseLayer>
+
+                                                            <LayersControl.Overlay name="Show Counties" >
+                                                                <GeoJSON data={counties.features}  style={countyStyle} onEachFeature={this.onEachCounty}/>
+                                                            </LayersControl.Overlay>
+
+
+                                                            <LayersControl.Overlay name="Show Markers" checked>
+                                                                <FeatureGroup>
+                                                                    {wrccStationMarkers}
+                                                                </FeatureGroup>
+                                                            </LayersControl.Overlay>
+
+                                                        </LayersControl>
+
+                                                    </Map>
+                                                    <div style={{width:'240px', float:'right'}}>
+                                                        <h4>Station details</h4>
+                                                        Name: {wrcc_station_locations[this.state.wrcc_station]['name']} <br/>
+                                                        Lat: {wrcc_station_locations[this.state.wrcc_station]['lat']} <br/>
+                                                        Lon: {wrcc_station_locations[this.state.wrcc_station]['lon']} <br/>
+                                                        Elevation: {wrcc_station_locations[this.state.wrcc_station]['elevation']} <br/>
+                                                    </div>
+                                                    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+                                                    <hr/>
+                                                </div>
+                                                :
+                                                <div></div>
+                                            }
+
+                                            <div style={{width:"100%", height:'60px'}}>
+                                                <button className='btn btn-light' style={{float:'left', width:'15%'}} onClick={this.prevDay}>Prev day</button>
+
+                                                <button className='btn btn-light' style={{float:'right', width:"15%"}} onClick={this.nextDay}>Next day</button>
+                                            </div>
+                                            <div style={{width:'100%'}}>
+                                                <MDBDataTable 
+                                                responsive
+                                                paging={false}
+                                                searching={false}
+                                                striped
+                                                bordered
+                                                data={this.state.wrccData}
+                                                />
+
+                                                <br/>
+                                                <hr/>
+
+                                                <h4>Graphs</h4>
+                                                <br/>
+                                                <Plot
+                                                    style = {{height:'400px'}}
+                                                    data = {wrcc_mph}
+                                                    layout = {{showlegend: true, title:'Ave. mph'}}
+                                                    config = {{responsive:true }}
+                                                />
+                                                <br/>
+                                                <Plot
+                                                    style = {{ height:'400px'}}
+                                                    data = {wrcc_temp}
+                                                    layout = {{showlegend:true, title: 'Air Temp Mean Deg. F'}}
+                                                    config = {{responsive:true }}
+                                                />
+                                                <br/>
+                                                <Plot
+                                                    style = {{height:'400px'}}
+                                                    data = {wrcc_precip}
+                                                    layout = {{showlegend:true, title:'Total Percip. inches' }}
+                                                    config = {{responsive:true }}
+                                                />
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
                                 :
                                 <div></div>
                             }
                         </div>
-                        :
+                        {/* :
                         <div>
                             <Map style={{height:'calc(100vh - 200px)', width:'calc(100vw - 600px)', border:'1px solid black', float:'left'}} zoom={6} center={[this.state.lat, this.state.lon]}>
                                 <LayersControl position="topright">
@@ -499,8 +777,8 @@ class WeatherDataCollection extends React.Component{
                                 </div>
                             }
                             </div>
-                        </div>
-                    }
+                        </div> 
+                    } */}
                 </div>
             </div>
         );
@@ -508,3 +786,109 @@ class WeatherDataCollection extends React.Component{
 }
 
 export default WeatherDataCollection;
+
+var wrccStations = {
+    'cald':'Alder Spring',
+    'casc':'Ash Creek',
+    'catl':'Atlas Peak',
+    'cbac':'Backbone',
+    'cbal':'Bald Mtn Loc',
+    'cbat':'Batterson',
+    'cbbr':'Big Bar',
+    'cben':'Benton',
+    'cbir':'Big Rock',
+    'cbld':'Blue Door',
+    'cblm':'Blacks Mountain',
+    'cblw':'Blue Ridge (KNF)',
+    'cbml':'Blue Mountain Lookout',
+    'cbmo':'Blue Mountain',
+    'cbmt':'Brush Mountain',
+    'cbnr':'Banner Road'
+}
+
+var wrcc_station_locations = {
+    'cald': {
+        'name': 'Alder Springs',
+        'lat': 39.651389,
+        'lon': -122.723611,
+        'elevation': 4300
+    },
+    'casc': {
+        'name': 'Ash Creek',
+        'lat': 41.276944,
+        'lon': -121.979444,
+        'elevation': 3200
+    },
+    'catl': {
+        'name': 'Atlas Peak',
+        'lat': 38.474444,
+        'lon': -122.264722,
+        'elevation': 1934
+    },
+    'cbac': {
+        'name': 'Backbone',
+        'lat': 40.889167,
+        'lon': -123.142222,
+        'elevation': 4700
+    },
+    'cbal': {
+        'name': 'Bald Mtn Loc',
+        'lat': 38.905556,
+        'lon': -120.697222,
+        'elevation': 4680
+    },
+    'cbat': {
+        'name': 'Batterson',
+        'lat': 37.231944,
+        'lon': -119.508333,
+        'elevation': 3160
+    },
+    'cbbr': {
+        'name': 'Big Bar',
+        'lat': 40.733333,
+        'lon': -123.233333,
+        'elevation': 1500
+    },
+    'cben': {
+        'name': 'Benton',
+        'lat': 37.843056,
+        'lon': -118.477778,
+        'elevation': 5450
+    },
+    'cbir': {
+        'name': 'Big Rock',
+        'lat': 38.039444,
+        'lon': -122.57,
+        'elevation': 1500
+    },
+    'cbld': {
+        'name': 'Blue Door',
+        'lat': 41.054722,
+        'lon': -120.3375,
+        'elevation': 5615
+    },
+    'cblm': {
+        'name': 'Blacks Mountain',
+        'lat': 40.77,
+        'lon': -121.168056,
+        'elevation': 7050
+    },
+    'cbml': {
+        'name': 'Blue Mountain Lookout',
+        'lat': 41.829722,
+        'lon': -120.865833,
+        'elevation': 5740
+    },
+    'cbmt': {
+        'name': 'Brush Mountain',
+        'lat': 40.915556,
+        'lon': -123.668611,
+        'elevation': 3988
+    },
+    'cbnr': {
+        'name': 'Atlas Peak',
+        'lat': 38.284444,
+        'lon': -120.489722,
+        'elevation': 2803
+    }
+}

@@ -19,7 +19,7 @@ class WrccStationSelector extends React.Component{
                 &nbsp;&nbsp;
                 Station: &nbsp;
                 <select style={{padding:'14px'}} onChange={this.handleChange}>
-                    <option value='cald'>Alder Spring</option>
+                    <option value='cald'>Alder Springs</option>
                     <option value='casc'>Ash Creek </option>
                     <option value='catl'>Atlas Peak</option>
                     <option value='cbac'>Backbone</option>
@@ -32,12 +32,10 @@ class WrccStationSelector extends React.Component{
                     <option value='cblm'>Blacks Mountain</option>
                     <option value='cblq'>Blue Ridge (KNF)</option>
                     <option value='cbml'>Blue Mountain Lookout</option>
-                    <option value='cbmo'>Blue Mountain</option>
                     <option value='cbmt'>Brush Mountain</option>
                     <option value='cbnr'>Banner Road</option>
                 </select>
             </div>
-
         );
     }
 }
