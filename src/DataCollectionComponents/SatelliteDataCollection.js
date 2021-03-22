@@ -16,7 +16,7 @@ class SatelliteDataCollection extends React.Component{
         super(props);
         
         this.state = {
-            source: 'USGS',
+            source: 'NASA',
             lat: props.lat,
             lon: props.lon,
             currentCounty: 'Alameda',
@@ -24,6 +24,15 @@ class SatelliteDataCollection extends React.Component{
             currentView: 'Table View',
             currentMarker: null,
             features: ['startTime', 'endTime', 'acquisitionDate', 'cloudCover', 'displayId', 'entityId', 'latitude', 'longitude'],
+            startDate: null,
+            endDate: null,
+            day: null,
+            month: null,
+            year: null,
+            nasaImageArea: 'North California',
+            nasaImageColor: 'True Color Composite',
+            nasaImageDate: '2021-03-10',
+            nasaImageUrl: null,
         }
 
         this.getData = this.getData.bind(this);
@@ -33,7 +42,12 @@ class SatelliteDataCollection extends React.Component{
         this.changeCounty = this.changeCounty.bind(this);
         this.handleViewChange = this.handleViewChange.bind(this);
         this.handleMarkerChange = this.handleMarkerChange.bind(this);
-
+        this.handleSourceChange = this.handleSourceChange.bind(this);
+        // this.getNasaData = this.getNasaData.bind(this);
+        this.handleNasaAreaChange = this.handleNasaAreaChange.bind(this);
+        this.handleNasaColorChange = this.handleNasaColorChange.bind(this);
+        this.handleNasaDateChange = this.handleNasaDateChange.bind(this);
+        this.getNasaImageUrl = this.getNasaImageUrl.bind(this);
     }
 
 
@@ -43,6 +57,18 @@ class SatelliteDataCollection extends React.Component{
         var year = today.getFullYear();
         var month = today.getMonth();
         var day = today.getDate();
+
+        var temp_month = month
+        temp_month += 1
+        if(temp_month < 10){
+            temp_month = '0' + temp_month
+        }
+
+        this.setState({
+            day: day,
+            month: temp_month,
+            year: year
+        })
 
         var dd = String(today.getDate()).padStart(2, '0');
         var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -59,7 +85,10 @@ class SatelliteDataCollection extends React.Component{
 
         var monthAgo = year+'-'+month+'-'+day;
 
-        this.getUSGSdata(monthAgo, today);
+        this.setState({
+            startDate: monthAgo,
+            endDate: today,
+        }, ()=>{this.getData()})
     }
 
     formatDate(date) {
@@ -78,8 +107,8 @@ class SatelliteDataCollection extends React.Component{
 
 
     getData(){
-        var startDate = document.getElementById('startDateInput').value;
-        var endDate = document.getElementById('endDateInput').value;
+        var startDate = this.state.startDate
+        var endDate = this.state.endDate
 
         var today = new Date();
         today = this.formatDate(today);
@@ -102,7 +131,9 @@ class SatelliteDataCollection extends React.Component{
         if(this.state.source === 'USGS'){
             this.getUSGSdata(startDate, endDate);
         }
-
+        else if(this.state.source === 'NASA'){
+            this.getNasaImageUrl();
+        }
     }
 
 
@@ -202,6 +233,55 @@ class SatelliteDataCollection extends React.Component{
         })
     }
 
+    handleSourceChange(newSource){
+        this.setState({
+            source: newSource
+        }, () => {this.getData()})
+    }
+
+    handleNasaAreaChange(newArea){
+        this.setState({
+            nasaImageArea: newArea
+        }, () => {this.getNasaImageUrl()})
+    }
+
+    handleNasaColorChange(newColor){
+        this.setState({
+            nasaImageColor: newColor
+        }, () => {this.getNasaImageUrl()})
+    }
+
+    handleNasaDateChange(newDate){
+        this.setState({
+            nasaImageDate: newDate
+        }, () => {this.getNasaImageUrl()})
+    }
+
+    getNasaImageUrl(){
+        var url = 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&&CRS=EPSG:4326&WRAP=DAY&LAYERS='
+
+        var height = 800
+        if(this.state.nasaImageColor === 'True Color Composite'){
+            url += 'MODIS_Terra_CorrectedReflectance_TrueColor'
+        }
+        else{
+            url += 'MODIS_Terra_CorrectedReflectance_Bands721'
+        }
+        url += '&FORMAT=image/jpeg&HEIGHT='+height+'&WIDTH='+height+'&BBOX='
+
+        if(this.state.nasaImageArea === 'North California'){
+            url += '37,-125,42,-120&TIME='
+        }
+        else{
+            url += '32,-122,39,-114&TIME='
+        }
+        url += this.state.nasaImageDate
+
+        this.setState({
+            nasaImageUrl: url,
+        })
+    }
+
     render(){
 
         delete L.Icon.Default.prototype._getIconUrl;
@@ -221,6 +301,11 @@ class SatelliteDataCollection extends React.Component{
                     toggleFilterDiv={this.toggleFilterDiv}
                     currentView={this.state.currentView}
                     handleViewChange={this.handleViewChange}
+                    dataSource = {this.state.source}
+                    handleNasaAreaChange = {this.handleNasaAreaChange}
+                    handleNasaColorChange={this.handleNasaColorChange}
+                    handleNasaDateChange={this.handleNasaDateChange}
+                    handleSourceChange={this.handleSourceChange}
                 />
                 <div>
                     <div>
@@ -228,6 +313,16 @@ class SatelliteDataCollection extends React.Component{
                             this.state.currentView === 'Table View'?
                             <div>
                                 {
+                                    this.state.source == 'NASA'?
+                                    <div>
+                                        <img src={this.state.nasaImageUrl} width='50%' style={{float:'left', border:'1px solid black'}}/>
+                                        <div style={{float:"right", width:'45%'}}>
+                                            Area: {this.state.nasaImageArea}<br/>
+                                            Bands: {this.state.nasaImageColor}<br/>
+                                            Date: {this.state.nasaImageDate}<br/>
+                                        </div>
+                                    </div>
+                                    :
                                     !this.state.data?
                                     <div>Getting data...</div>
                                     :

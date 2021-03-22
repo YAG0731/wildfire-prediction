@@ -7,6 +7,13 @@ import L from 'leaflet';
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import FilterDiv from '../Components/FilterDiv';
 
+import FireIcon from '../images/realistic_fire.png';
+
+var myIcon = L.icon({
+    iconUrl: FireIcon,
+    iconSize: [30, 40]
+})
+
 
 const devUrl = '';
 const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
@@ -196,12 +203,12 @@ class FireHistoryDataCollection extends React.Component{
 
     render(){
 
-        delete L.Icon.Default.prototype._getIconUrl;
-        L.Icon.Default.mergeOptions({
-            iconRetinaUrl: require('../images/fire.png'),
-            iconUrl: require('../images/fire.png'),
-            shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-        });
+        // delete L.Icon.Default.prototype._getIconUrl;
+        // L.Icon.Default.mergeOptions({
+        //     iconRetinaUrl: require('../images/fire.png'),
+        //     iconUrl: require('../images/fire.png'),
+        //     shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+        // });
 
         return(
             <div className="jumbotron" style={{margin:'10px 0 50px 0', paddingTop:'20px', overflow:'auto'}}>
@@ -280,7 +287,7 @@ class FireHistoryDataCollection extends React.Component{
                                     this.state.data.rows.map(
                                         marker => {
                                             return (
-                                                <Marker position={[marker['POO_LATITUDE'], marker['POO_LONGITUDE']]} key={marker['OBJECTID']} onclick={() => this.handleFireChange(marker)}>
+                                                <Marker position={[marker['POO_LATITUDE'], marker['POO_LONGITUDE']]} key={marker['OBJECTID']} onclick={() => this.handleFireChange(marker)} icon={myIcon}>
                                                     <Popup>
                                                         <p>Object ID: {marker['OBJECTID']}</p>
                                                         <p>Lat: {marker['POO_LATITUDE']}</p>

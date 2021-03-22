@@ -6,28 +6,64 @@ import L from 'leaflet';
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import FilterDiv from '../Components/FilterDiv'
 
-class LandCoverDataCollection extends React.Component{
+// import usgs images
+import usgs_img1 from './USGS_NDVI_images/2021-03-02 to 2021-03-08.jpg';
+import usgs_img2 from './USGS_NDVI_images/2021-02-23 to 2021-03-01.jpg';
+import usgs_img3 from './USGS_NDVI_images/2021-02-16 to 2021-02-22.jpg';
+import usgs_img4 from './USGS_NDVI_images/2021-02-09 to 2021-02-15.jpg';
+import usgs_img5 from './USGS_NDVI_images/2021-02-02 to 2021-02-08.jpg';
+import usgs_img6 from './USGS_NDVI_images/2021-01-26 to 2021-02-01.jpg';
+
+// import ncei images
+import ncei_img1 from './NCEI_NDVI_images/2021-01-01.png'
+import ncei_img2 from './NCEI_NDVI_images/2020-12-31.png'
+import ncei_img3 from './NCEI_NDVI_images/2020-12-30.png'
+import ncei_img4 from './NCEI_NDVI_images/2020-12-26.png'
+import ncei_img5 from './NCEI_NDVI_images/2020-12-25.png'
+import ncei_img6 from './NCEI_NDVI_images/2020-12-23.png'
+
+const usgs_ndvi_images = {
+    '2021-03-02 to 2021-03-08': usgs_img1,
+    '2021-02-23 to 2021-03-01': usgs_img2,
+    '2021-02-16 to 2021-02-22': usgs_img3,
+    '2021-02-09 to 2021-02-15': usgs_img4,
+    '2021-02-02 to 2021-02-08': usgs_img5,
+    '2021-01-26 to 2021-02-01': usgs_img6
+}
+
+const ncei_ndvi_images = {
+    '2021-01-01': ncei_img1,
+    '2020-12-31': ncei_img2,
+    '2020-12-30': ncei_img3,
+    '2020-12-26': ncei_img4,
+    '2020-12-25': ncei_img5,
+    '2020-12-23': ncei_img6
+}
+
+class VegetationDataCollection extends React.Component{
 
     constructor(props){
         super(props);
         
         this.state = {
-            source: 'USGS',
+            source: 'NCEI',
             lat: props.lat,
             lon: props.lon,
             currentCounty: 'Alameda',
-            data: null,
+            // data: null,
             currentView: 'Table View',
             currentMarker: null,
+            nceiDate: '2021-01-01',
+            usgsDateRange: '2021-03-02 to 2021-03-08',
         }
 
-        this.getData = this.getData.bind(this);
-        this.getUSGSdata = this.getUSGSdata.bind(this);
         this.formatDate = this.formatDate.bind(this);
         this.toggleFilterDiv = this.toggleFilterDiv.bind(this);
         this.changeCounty = this.changeCounty.bind(this);
         this.handleViewChange = this.handleViewChange.bind(this);
-
+        this.handleSourceChange = this.handleSourceChange.bind(this);
+        this.handleNceiDateChange = this.handleNceiDateChange.bind(this);
+        this.handleUsgsDateChange = this.handleUsgsDateChange.bind(this);
     }
 
     componentDidMount(){
@@ -52,7 +88,6 @@ class LandCoverDataCollection extends React.Component{
 
         var monthAgo = year+'-'+month+'-'+day;
 
-        this.getUSGSdata(monthAgo, today);
     }
 
     formatDate(date) {
@@ -92,17 +127,8 @@ class LandCoverDataCollection extends React.Component{
             return;
         }
 
-        if(this.state.source === 'USGS'){
-            this.getUSGSdata(startDate, endDate);
-        }
-
     }
 
-    getUSGSdata(start, end){
-        var lat = this.state.lat;
-        var lon = this.state.lon;
-
-    }
 
     toggleFilterDiv(){
         var filterDiv = document.getElementById('filterDiv');
@@ -127,6 +153,24 @@ class LandCoverDataCollection extends React.Component{
         })
     }
 
+    handleSourceChange(newSource){
+        this.setState({
+            source: newSource
+        })
+    }
+
+    handleNceiDateChange(newDate){
+        this.setState({
+            nceiDate: newDate
+        })
+    }
+
+    handleUsgsDateChange(newDate){
+        this.setState({
+            usgsDateRange: newDate
+        })
+    }
+
     render(){
 
         delete L.Icon.Default.prototype._getIconUrl;
@@ -140,20 +184,36 @@ class LandCoverDataCollection extends React.Component{
             <div className="jumbotron" style={{margin:'10px 0 50px 0', paddingTop:'20px', overflow:'auto'}}>
                 <FilterDiv
                     pageType='dataCollection' 
-                    dataType='landCover'
-                    getData={this.getData}
+                    dataType='vegetation'
                     changeCounty={this.changeCounty}
                     toggleFilterDiv={this.toggleFilterDiv}
                     currentView={this.state.currentView}
                     handleViewChange={this.handleViewChange}
+                    dataSource = {this.state.source}
+                    handleSourceChange = {this.handleSourceChange}
+                    handleNceiDateChange = {this.handleNceiDateChange}
+                    handleUsgsDateChange = {this.handleUsgsDateChange}
                 />
                 <div>
                     {
                         this.state.currentView === 'Table View'?
                         <div>
                             {
-                                !this.state.data?
-                                <div>API not implemented yet</div>
+                                this.state.source == 'NCEI'?
+                                <div>
+                                    NDVI:
+                                    <br/>
+                                    <br/>
+                                    <img src={ncei_ndvi_images[this.state.nceiDate]} width='75%' style={{border:'1px solid black'}} />
+                                </div>
+                                :
+                                this.state.source == 'USGS'?
+                                <div>
+                                    NDVI: 
+                                    <br/>
+                                    <br/>
+                                    <img src={usgs_ndvi_images[this.state.usgsDateRange]} width='75%' style={{border:'1px solid black'}}/>
+                                </div>
                                 :
                                 <div></div>
                             }
@@ -240,4 +300,4 @@ class LandCoverDataCollection extends React.Component{
     }
 }
 
-export default LandCoverDataCollection;
+export default VegetationDataCollection;

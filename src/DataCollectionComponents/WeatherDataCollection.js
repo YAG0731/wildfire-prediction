@@ -10,6 +10,7 @@ import Plot from 'react-plotly.js';
 import FilterDiv from '../Components/FilterDiv';
 import counties from '../counties.json';
 import BlueDot from '../images/blueDot.svg';
+import StationIcon from '../images/satellite.png';
 
 const devUrl = '';
 const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
@@ -18,6 +19,11 @@ const myIcon = L.icon({
     iconUrl: BlueDot,
     iconSize: [28,28],
 });
+
+const stationIcon = L.icon({
+    iconUrl: StationIcon,
+    iconSize: [36, 36],
+})
 
 class WeatherDataCollection extends React.Component{
 
@@ -69,10 +75,6 @@ class WeatherDataCollection extends React.Component{
 
     componentDidMount(){
         var today = new Date();
-        // console.log(today)
-        // console.log(today.getDate())
-        // console.log(today.getMonth())
-        // console.log(today.getFullYear())
 
         var year = today.getFullYear();
         var month = today.getMonth();
@@ -503,15 +505,9 @@ class WeatherDataCollection extends React.Component{
                     handleEndDateChange={this.handleEndDateChange}
                     handleSourceChange = {this.handleSourceChange}
                     handleWrccStationChange = {this.handleWrccStationChange}
+                    dataSource = {this.state.source}
                 />
-                {
-                    this.state.source != 'WRCC'?
-                    <p>
-                        <strong>Data for: </strong>{this.state.currentCounty} County ({this.state.startDate} to {this.state.endDate})
-                    </p>
-                    :
-                    <div></div>
-                }
+
                 <div>
                     {/* {
                         this.state.currentView === 'Table View'? */}
@@ -524,6 +520,111 @@ class WeatherDataCollection extends React.Component{
                                         <div>Getting data...</div>
                                         :
                                         <div>
+                                            {
+                                                this.state.currentView == 'Map View'?
+                                                <div>
+                                                    <Map style={{height:'calc(100vh - 200px)', width:'calc(100vw - 600px)', height:'400px', border:'1px solid black', float:'left'}} zoom={6} center={[this.state.lat, this.state.lon]}>
+                                                        <LayersControl position="topright">
+
+                                                            <LayersControl.BaseLayer name="Topology" checked>
+                                                                <TileLayer
+                                                                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                                                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.png"
+                                                                />
+                                                            </LayersControl.BaseLayer>
+
+                                                            <LayersControl.BaseLayer name="Street">
+                                                                <TileLayer
+                                                                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                                                />
+                                                            </LayersControl.BaseLayer>
+
+                                                            <LayersControl.BaseLayer name="Satellite">
+                                                                <TileLayer
+                                                                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                                                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png"
+                                                                />
+                                                            </LayersControl.BaseLayer>
+
+                                                            <LayersControl.BaseLayer name="Terrain">
+                                                                <TileLayer
+                                                                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                                                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}.png"
+                                                                />
+                                                            </LayersControl.BaseLayer>
+
+                                                            <LayersControl.BaseLayer name="Dark">
+                                                                <TileLayer
+                                                                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                                                url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
+                                                                />
+                                                            </LayersControl.BaseLayer>
+
+                                                            <LayersControl.Overlay name="Show Counties" >
+                                                                <GeoJSON data={counties.features}  style={countyStyle} onEachFeature={this.onEachCounty}/>
+                                                            </LayersControl.Overlay>
+
+                                                        </LayersControl>
+
+
+                                                        <MarkerClusterGroup>
+                                                            {
+                                                                this.state.weatherStationData == null?
+                                                                <div>Waiting for data to load...</div>
+                                                                :
+                                                                this.state.weatherStationData.map(
+                                                                    marker => {
+                                                                        return (
+                                                                            <Marker position={[marker['latitude'], marker['longitude']]} key={marker['id']} onclick={() => this.handleWeatherStationChange(marker)} icon={stationIcon}>
+                                                                                <Popup>
+                                                                                    <p>ID: {marker['id']}</p>
+                                                                                    <p>Lat: {marker['latitude']}</p>
+                                                                                    <p>Lon: {marker['longitude']}</p>
+                                                                                </Popup>
+                                                                            </Marker>
+                                                                        )
+                                                                    }
+                                                                )
+                                                            }
+                                                        </MarkerClusterGroup>
+                                                    </Map>
+
+                                                    <div style={{float:'right', padding:'6px', width:'230px'}}>
+                                                    {
+                                                        this.state.currentWeatherStation == null?
+                                                        <h3>Select a weather station for more info.</h3>
+                                                        :
+                                                        <div>
+                                                            <h3>Station info.</h3>
+                                                            <hr/>
+                                                            {
+                                                                this.state.weatherStationFeatures.map(
+                                                                    feature => {
+                                                                        return (
+                                                                        <div key={feature}>
+                                                                            <strong>{feature}: </strong>{this.state.currentWeatherStation[feature]}
+                                                                            <br/>
+                                                                            </div>
+                                                                        )
+                                                                    }
+                                                                )
+                                                            }
+                                                        </div>
+                                                    }
+                                                    </div>
+
+                                                    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+                                                    <br/><br/><br/><br/><br/><br/>
+                                                    <hr/>
+                                                </div>
+                                                :
+                                                <div></div>
+                                            }
+
+                                            <strong>Data for: </strong>{this.state.currentCounty} County ({this.state.startDate} to {this.state.endDate})
+                                            <br/><br/>
+
                                             <MDBDataTable responsive
                                             striped
                                             bordered

@@ -9,11 +9,13 @@ import CaFireData from './DetectionComponents/fire_history_ca.json';
 import WildfireDetection from './WildfireDetection';
 
 import RedDot from './images/redDot.svg';
+import FireIcon from './images/fire.png';
+import RealisticFireIcon from './images/realistic_fire.png'
 
-const myIcon = L.icon({
-    iconUrl: RedDot,
-    iconSize: [32,32],
-});
+var myIcon = L.icon({
+    iconUrl: RealisticFireIcon,
+    iconSize: [30,40],
+});;
 
 class Monitoring extends React.Component{
 
@@ -103,12 +105,26 @@ class Monitoring extends React.Component{
     }
 
     handleYearChange(event){
-        this.setState({currentFire:null, selectedYear: event.target.value});
+        if(event.target.value == 'Current'){
+            myIcon = L.icon({
+                iconUrl: RealisticFireIcon,
+                iconSize: [24,32],
+            });
+        }
+        else{
+            myIcon = L.icon({
+                iconUrl: RedDot,
+                iconSize: [32,32],
+            });
+        }
+
+        this.setState({
+            currentFire:null, 
+            selectedYear: event.target.value
+        });
     }
 
     handleFireSelect(event){
-        // console.log(event);
-        // alert(event.target._popup.options.children);
         var fire = {
             'name': event.target._popup.options.children[0].props.children,
             'latitude': event.latlng.lat,
@@ -119,36 +135,7 @@ class Monitoring extends React.Component{
         this.setState({
             currentFire: fire,
         })
-        // console.log(fire);
     }
-
-    // handleCitySearch(event){
-    //     event.preventDefault();
-    //     var cityInput = document.getElementById('citySearchInput').value;
-
-    //     var url = new URL('http://api.positionstack.com/v1/forward'),
-    //         params = {
-    //             access_key: '559dea75d5799296cfe4e650c073d4b2',
-    //             query: cityInput,
-    //         }
-    //     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
-    //     fetch(url)
-    //     .then(res => res.json())
-    //     .then(response => {
-    //         // console.log(data);
-    //         if(response['data'].length === 0){
-    //             alert('Please enter a valid location');
-    //         }
-    //         else{
-    //             var data = response['data'][0];
-    //             this.setState({
-    //                 latitude: data['latitude'],
-    //                 longitude: data['longitude']
-    //             })
-    //         }
-    //     })
-    //     document.getElementById('citySearchInput').value = '';
-    // }
 
     changeView(newView){
         this.setState({
@@ -217,21 +204,6 @@ class Monitoring extends React.Component{
             fillOpacity: 0.3,
         }
 
-        // delete L.Icon.Default.prototype._getIconUrl;
-        // L.Icon.Default.mergeOptions({
-        // iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-        // iconUrl: require("leaflet/dist/images/marker-icon.png"),
-        // shadowUrl: require("leaflet/dist/images/marker-shadow.png")
-        // });
-
-        var header = null;
-        {
-            this.state.currentView == 'Monitoring'?
-            header = <h1 className='mt-2'>Fire Monitoring <a style={{color:'grey'}} onClick={this.changeView.bind(this, 'Detection')}>/ Detection</a></h1>
-            :
-            header = <h1 className='mt-2'>Fire <a style={{color:'grey'}} onClick={this.changeView.bind(this, 'Monitoring')}>Monitoring / </a>Detection</h1>
-        }
-
         var styles = {
             buttonGroupButton: {
                 width: '20%',
@@ -265,7 +237,6 @@ class Monitoring extends React.Component{
 
                     <div style={{position:'fixed', backgroundColor:'#f8f9fa', height:"72px", width:"100%",  borderLeft:'1px solid #d9dadb', borderBottom:"1px solid #d9dadb", paddingLeft:"20px"}}>
                         <h1 className='mt-2'>Fire Monitoring / Detection</h1>
-                        {/* {header} */}
                     </div>
 
                     {
@@ -332,18 +303,6 @@ class Monitoring extends React.Component{
                                 </Map>
 
                                 <div style={{width:'260px', float:'right', borderLeft:'1px solid #d9dadb'}}>
-                                    {/* <div style={{marginTop:'16px'}}>
-                                        <form onSubmit={this.handleCitySearch}>
-                                            <div className="col-lg-10 mb-3">
-                                                <div className="input-group" style={{width:'226px'}}>
-                                                    <input type="text" className="form-control rounded-0" id="citySearchInput" placeholder="City Name" required />
-                                                    <div className="input-group-prepend">
-                                                        <input type="submit" value="Search" className="btn btn-primary btn-sm rounded-0" id="inputGroupPrepend2" style={{backgroundColor:'#1580fb'}}/>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div> */}
                                         <div style={{marginTop:'16px'}}>
                                             <div className="col-lg-10 mb-3">
                                                 <div className="input-group" style={{width:'226px'}}>

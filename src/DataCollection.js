@@ -4,7 +4,7 @@ import MyNavbar from './Components/MyNavbar';
 import WeatherDataCollection from './DataCollectionComponents/WeatherDataCollection';
 import SatelliteDataCollection from './DataCollectionComponents/SatelliteDataCollection';
 import FireHistoryDataCollection from './DataCollectionComponents/FireHistoryDataCollection';
-import LandCoverDataCollection from './DataCollectionComponents/LandCoverDataCollection';
+import VegetationDataCollection from './DataCollectionComponents/VegetationDataCollection';
 
 class DataCollection extends React.Component{
 
@@ -18,7 +18,7 @@ class DataCollection extends React.Component{
             weatherComponent: null,
             satelliteComponent: null,
             fireHistoryComponent: null,
-            landCoverComponent: null,
+            vegetationComponent: null,
         }
 
         this.getCoordinates = this.getCoordinates.bind(this);
@@ -37,7 +37,7 @@ class DataCollection extends React.Component{
             weatherComponent: <WeatherDataCollection lat={this.state.lat} lon={this.state.lon}/>,
             satelliteComponent: <SatelliteDataCollection lat={this.state.lat} lon={this.state.lon}/>,
             fireHistoryComponent: <FireHistoryDataCollection lat={this.state.lat} lon={this.state.lon}/>,
-            landCoverComponent: <LandCoverDataCollection lat={this.state.lat} lon={this.state.lon}/>,
+            vegetationComponent: <VegetationDataCollection lat={this.state.lat} lon={this.state.lon}/>,
         })
     }
 
@@ -110,10 +110,10 @@ class DataCollection extends React.Component{
                                     <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Fire History</button>
                                 }
                                 {
-                                    this.state.currentMode === 'Land Cover'?
-                                    <button style={styles.buttonGroupButtonActive}>Land Cover</button>
+                                    this.state.currentMode === 'Vegetation'?
+                                    <button style={styles.buttonGroupButtonActive}>Vegetation</button>
                                     :
-                                    <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Land Cover</button>
+                                    <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Vegetation</button>
                                 }
                                 {
                                     this.state.currentMode === 'Satellite'?
@@ -142,8 +142,8 @@ class DataCollection extends React.Component{
                                 <div></div>
                             }
                             {
-                                this.state.currentMode === 'Land Cover'?
-                                this.state.landCoverComponent
+                                this.state.currentMode === 'Vegetation'?
+                                this.state.vegetationComponent
                                 :
                                 <div></div>
                             }

@@ -7,14 +7,15 @@ class FilterDiv extends React.Component{
     constructor(props){
         super(props);
 
-        this.state = {
-            dataSource: 'WRCC'
-        }
-
         this.changeStartDate = this.changeStartDate.bind(this);
         this.changeEndDate = this.changeEndDate.bind(this);
         this.changeSource = this.changeSource.bind(this);
         this.changeWrccStation = this.changeWrccStation.bind(this);
+        this.changeNasaDate = this.changeNasaDate.bind(this);
+        this.changeNasaArea = this.changeNasaArea.bind(this);
+        this.changeNasaColor = this.changeNasaColor.bind(this);
+        this.changeNceiDate = this.changeNceiDate.bind(this);
+        this.changeUsgsDate = this.changeUsgsDate.bind(this);
     }
 
     changeStartDate(event){
@@ -26,15 +27,31 @@ class FilterDiv extends React.Component{
     }
 
     changeSource(event){
-        this.setState({
-            dataSource: event.target.value
-        })
-        // console.log('new source: ' + event.target.value)
         this.props.handleSourceChange(event.target.value);
     }
 
     changeWrccStation(station){
         this.props.handleWrccStationChange(station);
+    }
+
+    changeNasaArea(event){
+        this.props.handleNasaAreaChange(event.target.value)
+    }
+
+    changeNasaColor(event){
+        this.props.handleNasaColorChange(event.target.value)
+    }
+
+    changeNasaDate(event){
+        this.props.handleNasaDateChange(event.target.value)
+    }
+
+    changeNceiDate(event){
+        this.props.handleNceiDateChange(event.target.value)
+    }
+
+    changeUsgsDate(event){
+        this.props.handleUsgsDateChange(event.target.value)
     }
     
     render(){
@@ -49,8 +66,8 @@ class FilterDiv extends React.Component{
                             this.props.dataType === 'fireHistory'?
                             'Fire History'
                             :
-                            this.props.dataType === 'landCover'?
-                            'Land Cover'
+                            this.props.dataType === 'vegetation'?
+                            'Vegetation'
                             :
                             this.props.dataType === 'satellite'?
                             'Satellite'
@@ -101,13 +118,15 @@ class FilterDiv extends React.Component{
                                     <option value='USDA'>USDA</option>
                                 </select>
                                 :
-                                this.props.dataType === 'landCover'?
-                                <select id="dataSourceInput" style={{padding:'14px'}}>
+                                this.props.dataType === 'vegetation'?
+                                <select id="dataSourceInput" style={{padding:'14px'}} onChange={this.changeSource}>
+                                    <option value='NCEI'>NCEI</option>
                                     <option value='USGS'>USGS</option>
                                 </select>
                                 :
                                 this.props.dataType === 'satellite'?
-                                <select id="dataSourceInput" style={{padding:'14px'}}>
+                                <select id="dataSourceInput" style={{padding:'14px'}} onChange={this.changeSource}>
+                                    <option value='NASA'>NASA</option>
                                     <option value='USGS'>USGS</option>
                                 </select>
                                 :
@@ -115,9 +134,58 @@ class FilterDiv extends React.Component{
                             }
                         </div>
                         {
-                            this.state.dataSource == 'WRCC'?
+                            this.props.dataType == 'vegetation' && this.props.dataSource == 'NCEI'?
+                            <div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                Date:
+                                &nbsp;&nbsp;
+                                <select style={{padding:'14px'}} onChange={this.changeNceiDate}>
+                                    <option value='2021-01-01'>2021-01-01</option>
+                                    <option value='2020-12-31'>2020-12-31</option>
+                                    <option value='2020-12-30'>2020-12-30</option>
+                                    <option value='2020-12-26'>2020-12-26</option>
+                                    <option value='2020-12-25'>2020-12-25</option>
+                                    <option value='2020-12-23'>2020-12-23</option>
+                                </select>
+                            </div>
+                            :
+                            this.props.dataSource == 'USGS' && this.props.dataType == 'vegetation'?
+                            <div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                Date Range: &nbsp;&nbsp;
+                                {/* <input type='week' style={{padding:'10px'}} min='2021-W01' max='2021-W10'/> */}
+                                <select style={{padding:'14px'}} onChange={this.changeUsgsDate}>
+                                    <option value='2021-03-02 to 2021-03-08'>2021-03-02 to 2021-03-08</option>
+                                    <option value='2021-02-23 to 2021-03-01'>2021-02-23 to 2021-03-01</option>
+                                    <option value='2021-02-16 to 2021-02-22'>2021-02-16 to 2021-02-22</option>
+                                    <option value='2021-02-09 to 2021-02-15'>2021-02-09 to 2021-02-15</option>
+                                    <option value='2021-02-02 to 2021-02-08'>2021-02-02 to 2021-02-08</option>
+                                    <option value='2021-01-26 to 2021-02-01'>2021-01-26 to 2021-02-01</option>
+                                </select>
+                            </div>
+                            :
+                            this.props.dataSource == 'WRCC'?
                             <div>
                                 <WrccStationSelector handleChange={this.changeWrccStation}/>
+                            </div>
+                            :
+                            this.props.dataSource == 'NASA'?
+                            <div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <select style={{padding:'14px'}} onChange={this.changeNasaArea}>
+                                    <option value='North California'>North California</option>
+                                    <option value='South California'>South California</option>
+                                </select>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                                <select style={{padding:'14px'}} onChange={this.changeNasaColor}>
+                                    <option value='True Color Composite'>True Color Composite</option>
+                                    <option value='False Color Composite'>False Color Composite</option>
+                                </select>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                                <input type='date' style={{padding:'10px'}} onChange={this.changeNasaDate}/>
+                                <br/>
                             </div>
                             :
                             <div>
@@ -146,7 +214,10 @@ class FilterDiv extends React.Component{
                         <br/> */}
                     </div>
                     {
-                        this.state.dataSource == 'WRCC'?
+                        this.props.dataSource == 'WRCC' || this.props.dataSource == 'NASA' || this.props.dataSource == 'NCEI'?
+                        <div></div>
+                        :
+                        this.props.dataSource == 'USGS' && this.props.dataType == 'vegetation'?
                         <div></div>
                         :
                         <div>
