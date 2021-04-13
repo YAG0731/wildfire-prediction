@@ -4,7 +4,10 @@ import {Map, TileLayer, LayersControl} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import MarkerClusterGroup from "react-leaflet-markercluster";
-import FilterDiv from '../Components/FilterDiv'
+import FilterDiv from '../Components/FilterDiv';
+// import { SketchPicker } from 'react-color';
+import ColorPicker from '../Components/ColorPicker';
+
 
 // import usgs images
 import usgs_img1 from './USGS_NDVI_images/2021-03-02 to 2021-03-08.jpg';
@@ -46,7 +49,7 @@ class VegetationDataCollection extends React.Component{
         super(props);
         
         this.state = {
-            source: 'NCEI',
+            source: 'Landsat',
             lat: props.lat,
             lon: props.lon,
             currentCounty: 'Alameda',
@@ -55,6 +58,37 @@ class VegetationDataCollection extends React.Component{
             currentMarker: null,
             nceiDate: '2021-01-01',
             usgsDateRange: '2021-03-02 to 2021-03-08',
+            landsatDate: '20210309_20210317',
+            gotLandsatNdviImage: false,
+            // color1: ['4','60','48'],
+            // color2: ['116', '67', '17'],
+            landsatImageColors: [
+                ['4','60','48'],
+                ['29', '121', '113'],
+                ['29', '121', '113'],
+                ['108', '188', '177'],
+                ['200', '234', '229'],
+                ['200', '234', '229'],
+                ['245', '240', '226'],
+                ['231', '206', '154'],
+                ['231', '206', '154'],
+                ['188', '127', '56'],
+                ['116', '67', '17'],
+            ],
+
+            // landsat_1: ['4','60','48'],
+            // landsat_0_8: ['29', '121', '113'],
+            // landsat_0_6: ['108', '188', '177'],
+            // landsat_0_4: ['200', '234', '229'],
+            // landsat_0_2: ['245', '240', '226'],
+            // landsat_0: ['231', '206', '154'],
+            // landsat_negative_0_2: ['188', '127', '56'],
+            // landsat_negative_0_4: ['116', '67', '17'],
+            landsatPath: '40',
+            landsatRow: '37',
+            landsatResult: 'success',
+            landsatImageUrlRand: null,
+
         }
 
         this.formatDate = this.formatDate.bind(this);
@@ -64,6 +98,15 @@ class VegetationDataCollection extends React.Component{
         this.handleSourceChange = this.handleSourceChange.bind(this);
         this.handleNceiDateChange = this.handleNceiDateChange.bind(this);
         this.handleUsgsDateChange = this.handleUsgsDateChange.bind(this);
+        this.handleLandsatDateChange = this.handleLandsatDateChange.bind(this);
+        // this.handleLandsatIncrementColorChange = this.handleLandsatIncrementColorChange.bind(this);
+        // this.colorToHex = this.colorToHex.bind(this);
+        this.rgbToHex = this.rgbToHex.bind(this);
+        this.getLandsatData = this.getLandsatData.bind(this);
+        this.handleLandsatPathChange = this.handleLandsatPathChange.bind(this);
+        this.handleLandsatRowChange = this.handleLandsatRowChange.bind(this);
+        this.decimalToHex = this.decimalToHex.bind(this);
+        this.handleLandsatImageColorChange = this.handleLandsatImageColorChange.bind(this);
     }
 
     componentDidMount(){
@@ -87,6 +130,8 @@ class VegetationDataCollection extends React.Component{
         }
 
         var monthAgo = year+'-'+month+'-'+day;
+
+        this.getLandsatData()
 
     }
 
@@ -126,9 +171,7 @@ class VegetationDataCollection extends React.Component{
             alert('Please select a start and end date');
             return;
         }
-
     }
-
 
     toggleFilterDiv(){
         var filterDiv = document.getElementById('filterDiv');
@@ -171,6 +214,123 @@ class VegetationDataCollection extends React.Component{
         })
     }
 
+    handleLandsatDateChange(newDate){
+        this.setState({
+            landsatDate: newDate
+        }, ()=>{this.getLandsatData()} )
+    }
+
+    getLandsatData(){
+        this.setState({
+            gotLandsatNdviImage: false,
+            landsatResult: 'success',
+            landsatImageUrl: null,
+        })
+
+        var path = this.state.landsatPath
+        if(path.length == 1){
+            path = '00' + path
+        }
+        else{
+            path = '0' + path
+        }
+
+        var row = this.state.landsatRow
+        if(row.length == 1){
+            row = '00' + row
+        }
+        else{
+            row = '0' + row
+        }
+
+        var colors = []
+        for(var i=0; i<this.state.landsatImageColors.length; i++){
+            var color = this.state.landsatImageColors[i]
+            colors.push(this.rgbToHex(color))
+        }
+        
+        // colors.push(this.rgbToHex(this.state.landsat_1))
+        // colors.push(this.rgbToHex(this.state.landsat_0_8))
+        // colors.push(this.rgbToHex(this.state.landsat_0_6))
+        // colors.push(this.rgbToHex(this.state.landsat_0_4))
+        // colors.push(this.rgbToHex(this.state.landsat_0_2))
+        // colors.push(this.rgbToHex(this.state.landsat_0))
+        // colors.push(this.rgbToHex(this.state.landsat_negative_0_2))
+        // colors.push(this.rgbToHex(this.state.landsat_negative_0_4))
+
+        fetch('/api/get_aws_ndvi_image',{
+            method: 'POST',
+            body: JSON.stringify({
+                date: this.state.landsatDate,
+                colors: colors,
+                path: path,
+                row: row
+            })
+        })
+        .then(res => res.json())
+        .then(response => {
+            if(response['result'] == 'failure'){
+                this.setState({
+                    landsatResult: 'failure'
+                })
+            }
+            else{
+                this.setState({
+                    gotLandsatNdviImage: true,
+                    landsatImageUrlRand: response['rand']
+                })
+            }
+        })
+    }
+
+    handleLandsatImageColorChange(colorNumber, newColor){
+        console.log('changing color: '+newColor)
+        var colors = this.state.landsatImageColors
+        colors[colorNumber] = [newColor.r, newColor.g, newColor.b]
+
+        this.setState({
+            landsatImageColors: colors
+        })
+
+        console.log('done')
+    }
+
+    decimalToHex(decimal){
+        var hex = Number(decimal).toString(16);
+        if (hex.length < 2) {
+                hex = "0" + hex;
+        }
+        return hex;
+    }
+
+    rgbToHex(rgb) {
+        return '#' + this.decimalToHex(rgb[0]) + this.decimalToHex(rgb[1]) + this.decimalToHex(rgb[2]);
+      }
+
+    handleLandsatPathChange(newPath){
+        if(newPath < 8){
+            newPath = 8
+        }
+        else if(newPath > 55){
+            newPath = 55
+        }
+        this.setState({
+            landsatPath: newPath
+        })
+    }
+
+    handleLandsatRowChange(newRow){
+        if(newRow < 20){
+            newRow = 20
+        }
+        else if(newRow > 45){
+            newRow = 45
+        }
+        this.setState({
+            landsatRow: newRow
+        })
+    }
+
     render(){
 
         delete L.Icon.Default.prototype._getIconUrl;
@@ -179,6 +339,8 @@ class VegetationDataCollection extends React.Component{
             iconUrl: require('leaflet/dist/images/marker-icon.png'),
             shadowUrl: require('leaflet/dist/images/marker-shadow.png')
         });
+
+        console.log(this.state.landsatImageColors)
 
         return(
             <div className="jumbotron" style={{margin:'10px 0 50px 0', paddingTop:'20px', overflow:'auto'}}>
@@ -193,12 +355,69 @@ class VegetationDataCollection extends React.Component{
                     handleSourceChange = {this.handleSourceChange}
                     handleNceiDateChange = {this.handleNceiDateChange}
                     handleUsgsDateChange = {this.handleUsgsDateChange}
+                    handleLandsatDateChange = {this.handleLandsatDateChange}
+                    landsatPath = {this.state.landsatPath}
+                    landsatRow = {this.state.landsatRow}
+                    handleLandsatPathChange = {this.handleLandsatPathChange}
+                    handleLandsatRowChange = {this.handleLandsatRowChange}
+                    getLandsatData = {this.getLandsatData}
                 />
                 <div>
                     {
                         this.state.currentView === 'Table View'?
                         <div>
                             {
+                                this.state.source == 'Landsat'?
+                                <div>
+                                    Image for: {this.state.landsatDate.substring(0, 4)}-{this.state.landsatDate.substring(4,6)}-{this.state.landsatDate.substring(6, 8)}, Path = {this.state.landsatPath}, Row = {this.state.landsatRow}
+                                    <br/>
+                                    <br/>
+
+                                    {
+                                        this.state.landsatResult == 'failure'?
+                                        <div>
+                                            <p style={{color:'red'}}>
+                                                There is no data for this date, path, and row combination.
+                                            </p>
+                                        </div>
+                                        :
+                                        this.state.gotLandsatNdviImage == false?
+                                        <div>
+                                            Loading...
+                                        </div>
+                                        :
+                                        <div style={{width:'50%', float:'left'}}>
+                                            <img src={'/api/'+this.state.landsatImageUrlRand+'/aws_ndvi_image.png'} alt='ndvi_image' width='100%' style={{border:'1px solid black'}}/>
+                                        </div>
+
+                                    }
+
+                                    <div style={{border:'1px solid grey', borderRadius:'5px', float:'right', width:'300px', padding:'16px'}}>
+                                        <h4>Customize image colors</h4>
+                                        <hr/>
+
+                                        {
+                                            this.state.landsatImageColors.map((color, index) => {
+                                                return(
+                                                    <div style={{width:'125px', height:'36px'}} key={index}>
+                                                        <div style={{float:'left'}}>Color {index + 1}:</div>
+                                                        <div style={{float:'right'}}>
+                                                            <ColorPicker 
+                                                                r={color[0]} 
+                                                                g={color[1]} 
+                                                                b={color[2]} 
+                                                                colorNumber={index}
+                                                                handleLandsatImageColorChange = {this.handleLandsatImageColorChange}/>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })
+                                        }
+
+                                        <button className='btn btn-primary' style={{float:'right'}} onClick={this.getLandsatData}>Update</button>
+                                    </div>
+                                </div>
+                                :
                                 this.state.source == 'NCEI'?
                                 <div>
                                     NDVI:

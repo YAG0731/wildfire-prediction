@@ -16,6 +16,9 @@ class FilterDiv extends React.Component{
         this.changeNasaColor = this.changeNasaColor.bind(this);
         this.changeNceiDate = this.changeNceiDate.bind(this);
         this.changeUsgsDate = this.changeUsgsDate.bind(this);
+        this.changeLandsatDate = this.changeLandsatDate.bind(this);
+        this.changeLandsatPath = this.changeLandsatPath.bind(this);
+        this.changeLandsatRow = this.changeLandsatRow.bind(this);
     }
 
     changeStartDate(event){
@@ -53,6 +56,18 @@ class FilterDiv extends React.Component{
     changeUsgsDate(event){
         this.props.handleUsgsDateChange(event.target.value)
     }
+
+    changeLandsatDate(event){
+        this.props.handleLandsatDateChange(event.target.value)
+    }
+
+    changeLandsatPath(event){
+        this.props.handleLandsatPathChange(event.target.value)
+    }
+
+    changeLandsatRow(event){
+        this.props.handleLandsatRowChange(event.target.value)
+    }
     
     render(){
         return(
@@ -77,7 +92,7 @@ class FilterDiv extends React.Component{
                     </h4>
 
                     {
-                        this.props.pageType === 'dataCollection'?
+                        this.props.pageType === 'dataCollection' && this.props.dataType != 'vegetation'?
                             this.props.currentView === 'Table View'?
                             <button className='btn btn-success' onClick={this.props.handleViewChange} style={{float:'right', margin:'0 0 0 10px'}} >Map View</button>
                             :
@@ -120,6 +135,7 @@ class FilterDiv extends React.Component{
                                 :
                                 this.props.dataType === 'vegetation'?
                                 <select id="dataSourceInput" style={{padding:'14px'}} onChange={this.changeSource}>
+                                    <option value='Landsat'>Landsat</option>
                                     <option value='NCEI'>NCEI</option>
                                     <option value='USGS'>USGS</option>
                                 </select>
@@ -188,6 +204,34 @@ class FilterDiv extends React.Component{
                                 <br/>
                             </div>
                             :
+                            this.props.dataType == 'vegetation' && this.props.dataSource == 'Landsat'?
+                            <div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                Date: &nbsp;&nbsp;
+                                <select onChange={this.changeLandsatDate} style={{padding:'14px'}}>
+                                    <option value='20210309_20210317'>2021-03-09</option>
+                                    <option value='20210221_20210304'>2021-02-21</option>
+                                    <option value='20210205_20210304'>2021-02-05</option>
+                                    <option value='20201203_20201218'>2020-12-03</option>
+                                    <option value='20201117_20201210'>2020-11-17</option>
+                                    <option value='20201016_20201104'>2020-10-16</option>
+                                    <option value='20200914_20200920'>2020-09-14</option>
+                                    <option value='20200829_20200905'>2020-08-29</option>
+                                    <option value='20200813_20200822'>2020-08-13</option>
+                                </select>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+
+                                Path: &nbsp;&nbsp;
+                                <input type='number' min='8' max='55' value={this.props.landsatPath} style={{padding:'14px'}} onChange={this.changeLandsatPath} />
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+
+                                Row: &nbsp;&nbsp;
+                                <input type='number' min='20' max='45' value={this.props.landsatRow} style={{padding:'14px'}} onChange={this.changeLandsatRow} />
+
+                                <button className='btn btn-primary' style={{float:'right'}} onClick={this.props.getLandsatData}>Get Data</button>
+
+                            </div>
+                            :
                             <div>
                                 <div style={{float:'right'}}>
                                     From:&nbsp;
@@ -218,6 +262,9 @@ class FilterDiv extends React.Component{
                         <div></div>
                         :
                         this.props.dataSource == 'USGS' && this.props.dataType == 'vegetation'?
+                        <div></div>
+                        :
+                        this.props.dataSource == 'Landsat' && this.props.dataType == 'vegetation'?
                         <div></div>
                         :
                         <div>
