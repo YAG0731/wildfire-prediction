@@ -254,14 +254,6 @@ class VegetationDataCollection extends React.Component{
             colors.push(this.rgbToHex(color))
         }
         
-        // colors.push(this.rgbToHex(this.state.landsat_1))
-        // colors.push(this.rgbToHex(this.state.landsat_0_8))
-        // colors.push(this.rgbToHex(this.state.landsat_0_6))
-        // colors.push(this.rgbToHex(this.state.landsat_0_4))
-        // colors.push(this.rgbToHex(this.state.landsat_0_2))
-        // colors.push(this.rgbToHex(this.state.landsat_0))
-        // colors.push(this.rgbToHex(this.state.landsat_negative_0_2))
-        // colors.push(this.rgbToHex(this.state.landsat_negative_0_4))
 
         fetch('/api/get_aws_ndvi_image',{
             method: 'POST',
