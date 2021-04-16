@@ -207,7 +207,7 @@ class FilterDiv extends React.Component{
                             this.props.dataType == 'vegetation' && this.props.dataSource == 'Landsat'?
                             <div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                Date: &nbsp;&nbsp;
+                                {/* Date: &nbsp;&nbsp;
                                 <select onChange={this.changeLandsatDate} style={{padding:'14px'}}>
                                     <option value='20210309_20210317'>2021-03-09</option>
                                     <option value='20210221_20210304'>2021-02-21</option>
@@ -219,6 +219,10 @@ class FilterDiv extends React.Component{
                                     <option value='20200829_20200905'>2020-08-29</option>
                                     <option value='20200813_20200822'>2020-08-13</option>
                                 </select>
+                                &nbsp;&nbsp;&nbsp;&nbsp; */}
+
+                                Date: &nbsp;&nbsp;
+                                <input type='date' defaultValue='2021-02-21' style={{padding:'10px'}} onChange={this.changeLandsatDate}/>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
 
                                 Path: &nbsp;&nbsp;

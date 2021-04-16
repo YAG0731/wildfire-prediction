@@ -58,7 +58,7 @@ class VegetationDataCollection extends React.Component{
             currentMarker: null,
             nceiDate: '2021-01-01',
             usgsDateRange: '2021-03-02 to 2021-03-08',
-            landsatDate: '20210309_20210317',
+            landsatDate: '20210221_20210221',
             gotLandsatNdviImage: false,
             // color1: ['4','60','48'],
             // color2: ['116', '67', '17'],
@@ -215,8 +215,13 @@ class VegetationDataCollection extends React.Component{
     }
 
     handleLandsatDateChange(newDate){
+        // var date = newDate.getFullYear() + '' + newDate.getMonth() + '' + newDate.getDate();
+        var date = newDate.split('-');
+        date = date[0] + date[1] + date[2];
+        date += '_' + date
+        console.log(date)
         this.setState({
-            landsatDate: newDate
+            landsatDate: date
         }, ()=>{this.getLandsatData()} )
     }
 
@@ -333,6 +338,8 @@ class VegetationDataCollection extends React.Component{
 
     render(){
 
+        var ndvi_indices = ['-1', '-0.5', '-0.2', '0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.8', '1']
+
         delete L.Icon.Default.prototype._getIconUrl;
         L.Icon.Default.mergeOptions({
             iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -393,14 +400,14 @@ class VegetationDataCollection extends React.Component{
                                     }
 
                                     <div style={{border:'1px solid grey', borderRadius:'5px', float:'right', width:'300px', padding:'16px'}}>
-                                        <h4>Customize image colors</h4>
+                                        <h4>Customize NDVI colors</h4>
                                         <hr/>
 
                                         {
                                             this.state.landsatImageColors.map((color, index) => {
                                                 return(
                                                     <div style={{width:'125px', height:'36px'}} key={index}>
-                                                        <div style={{float:'left'}}>Color {index + 1}:</div>
+                                                        <div style={{float:'left'}}>{ndvi_indices[index]}:</div>
                                                         <div style={{float:'right'}}>
                                                             <ColorPicker 
                                                                 r={color[0]} 
