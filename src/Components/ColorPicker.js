@@ -33,7 +33,12 @@ class ColorPicker extends React.Component {
       g: color.rgb['g'],
       b: color.rgb['b']
     })
-    this.props.handleLandsatImageColorChange(this.props.colorNumber, color.rgb)
+    if(this.props.dataSource == 'landsat'){
+      this.props.handleLandsatImageColorChange(this.props.colorNumber, color.rgb)
+    }
+    else if(this.props.dataSource == 'modis'){
+      this.props.handleModiImageColorChange(this.props.colorNumber, color.rgb)
+    }
   };
 
   render() {

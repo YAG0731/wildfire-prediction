@@ -19,6 +19,9 @@ class FilterDiv extends React.Component{
         this.changeLandsatDate = this.changeLandsatDate.bind(this);
         this.changeLandsatPath = this.changeLandsatPath.bind(this);
         this.changeLandsatRow = this.changeLandsatRow.bind(this);
+        this.changeModisHorizontal = this.changeModisHorizontal.bind(this);
+        this.changeModisVertical = this.changeModisVertical.bind(this);
+        this.changeModisDate = this.changeModisDate.bind(this);
     }
 
     changeStartDate(event){
@@ -67,6 +70,18 @@ class FilterDiv extends React.Component{
 
     changeLandsatRow(event){
         this.props.handleLandsatRowChange(event.target.value)
+    }
+
+    changeModisHorizontal(event){
+        this.props.handleModisHorizontalChange(event.target.value)
+    }
+
+    changeModisVertical(event){
+        this.props.handleModisVerticalChange(event.target.value)
+    }
+
+    changeModisDate(event){
+        this.props.handleModisDateChange(event.target.value)
     }
     
     render(){
@@ -136,6 +151,7 @@ class FilterDiv extends React.Component{
                                 this.props.dataType === 'vegetation'?
                                 <select id="dataSourceInput" style={{padding:'14px'}} onChange={this.changeSource}>
                                     <option value='Landsat'>Landsat</option>
+                                    <option value='Modis'>Modis</option>
                                     <option value='NCEI'>NCEI</option>
                                     <option value='USGS'>USGS</option>
                                 </select>
@@ -207,20 +223,6 @@ class FilterDiv extends React.Component{
                             this.props.dataType == 'vegetation' && this.props.dataSource == 'Landsat'?
                             <div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                {/* Date: &nbsp;&nbsp;
-                                <select onChange={this.changeLandsatDate} style={{padding:'14px'}}>
-                                    <option value='20210309_20210317'>2021-03-09</option>
-                                    <option value='20210221_20210304'>2021-02-21</option>
-                                    <option value='20210205_20210304'>2021-02-05</option>
-                                    <option value='20201203_20201218'>2020-12-03</option>
-                                    <option value='20201117_20201210'>2020-11-17</option>
-                                    <option value='20201016_20201104'>2020-10-16</option>
-                                    <option value='20200914_20200920'>2020-09-14</option>
-                                    <option value='20200829_20200905'>2020-08-29</option>
-                                    <option value='20200813_20200822'>2020-08-13</option>
-                                </select>
-                                &nbsp;&nbsp;&nbsp;&nbsp; */}
-
                                 Date: &nbsp;&nbsp;
                                 <input type='date' defaultValue='2021-02-21' style={{padding:'10px'}} onChange={this.changeLandsatDate}/>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
@@ -234,6 +236,26 @@ class FilterDiv extends React.Component{
 
                                 <button className='btn btn-primary' style={{float:'right'}} onClick={this.props.getLandsatData}>Get Data</button>
 
+                            </div>
+                            :
+                            this.props.dataType == 'vegetation' && this.props.dataSource == 'Modis'?
+                            <div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                                Date: &nbsp;&nbsp;
+                                <input type='date' style={{padding:'10px'}} onChange={this.changeModisDate}/>
+                                &nbsp;&nbsp;
+
+                                Horizontal: &nbsp;&nbsp;
+                                <input type='number' min='0' max='35' value={this.props.modisHorizontal} style={{padding:'14px'}} onChange={this.changeModisHorizontal} />
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+
+                                Vertical: &nbsp;&nbsp;
+                                <input type='number' min='0' max='17' value={this.props.modisVertical} style={{padding:'14px'}} onChange={this.changeModisVertical} />
+
+                                &nbsp;&nbsp;
+                                <button className='btn btn-primary' style={{float:'right'}} onClick={this.props.getModisData}>Get Data</button>
+                                
                             </div>
                             :
                             <div>
@@ -250,16 +272,7 @@ class FilterDiv extends React.Component{
                             </div>
 
                         }
-                        {/* <div style={{float:'right'}}>
-                            From:&nbsp;
-                            <input type='date' style={{padding:'10px'}} id="startDateInput" onChange={this.changeStartDate}/>
-                            &nbsp; - &nbsp;
-                            <input type='date' style={{padding:'10px'}} id='endDateInput' onChange={this.changeEndDate}/>
-                            &nbsp;&nbsp;&nbsp;&nbsp;
-                        </div>
-                        <br/>
-                        <br/>
-                        <br/> */}
+
                     </div>
                     {
                         this.props.dataSource == 'WRCC' || this.props.dataSource == 'NASA' || this.props.dataSource == 'NCEI'?
@@ -269,6 +282,9 @@ class FilterDiv extends React.Component{
                         <div></div>
                         :
                         this.props.dataSource == 'Landsat' && this.props.dataType == 'vegetation'?
+                        <div></div>
+                        :
+                        this.props.dataSource == 'Modis' && this.props.dataType == 'vegetation'?
                         <div></div>
                         :
                         <div>

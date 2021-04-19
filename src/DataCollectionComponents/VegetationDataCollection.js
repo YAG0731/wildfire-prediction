@@ -75,11 +75,31 @@ class VegetationDataCollection extends React.Component{
                 ['188', '127', '56'],
                 ['116', '67', '17'],
             ],
-
             landsatPath: '40',
             landsatRow: '37',
             landsatResult: 'success',
             landsatImageUrlRand: null,
+
+            gotModisImage: false,
+            modisResult: 'success',
+            modisImageUrlRand: null,
+            modisImageColors: [
+                ['0','0','0'],
+                ['0','100','0'],
+                ['34','139','34'],
+                ['124','252','0'],
+                ['255','165','0'],
+                ['255','255','0'],
+                ['255','0','0'],
+                ['128','0','0'],
+                ['0','255','255'],
+                ['0','128','128'],
+                ['0','0','128']
+            ],
+            modisHorizontal: '08',
+            modisVertical: '05',
+            modisAcquiredYear: '2018',
+            modisAcquiredDay: '313'
 
         }
 
@@ -99,6 +119,11 @@ class VegetationDataCollection extends React.Component{
         this.handleLandsatRowChange = this.handleLandsatRowChange.bind(this);
         this.decimalToHex = this.decimalToHex.bind(this);
         this.handleLandsatImageColorChange = this.handleLandsatImageColorChange.bind(this);
+        this.getModisNdviData = this.getModisNdviData.bind(this);
+        this.handleModiImageColorChange = this.handleModiImageColorChange.bind(this);
+        this.handleModisHorizontalChange = this.handleModisHorizontalChange.bind(this);
+        this.handleModisVerticalChange = this.handleModisVerticalChange.bind(this);
+        this.handleModisDateChange = this.handleModisDateChange.bind(this);
     }
 
     componentDidMount(){
@@ -124,6 +149,7 @@ class VegetationDataCollection extends React.Component{
         var monthAgo = year+'-'+month+'-'+day;
 
         this.getLandsatData()
+        this.getModisNdviData()
 
     }
 
@@ -182,7 +208,6 @@ class VegetationDataCollection extends React.Component{
     }
 
     handleViewChange(event){
-        console.log('changed to: '+event.target.innerHTML);
         this.setState({
             currentView: event.target.innerHTML,
         })
@@ -211,7 +236,6 @@ class VegetationDataCollection extends React.Component{
         var date = newDate.split('-');
         date = date[0] + date[1] + date[2];
         date += '_' + date
-        console.log(date)
         this.setState({
             landsatDate: date
         }, ()=>{this.getLandsatData()} )
@@ -221,7 +245,6 @@ class VegetationDataCollection extends React.Component{
         this.setState({
             gotLandsatNdviImage: false,
             landsatResult: 'success',
-            landsatImageUrl: null,
         })
 
         var path = this.state.landsatPath
@@ -247,7 +270,7 @@ class VegetationDataCollection extends React.Component{
         }
         
 
-        fetch('/api/get_aws_ndvi_image',{
+        fetch('/api/get_landsat_ndvi_image',{
             method: 'POST',
             body: JSON.stringify({
                 date: this.state.landsatDate,
@@ -273,15 +296,12 @@ class VegetationDataCollection extends React.Component{
     }
 
     handleLandsatImageColorChange(colorNumber, newColor){
-        console.log('changing color: '+newColor)
         var colors = this.state.landsatImageColors
         colors[colorNumber] = [newColor.r, newColor.g, newColor.b]
 
         this.setState({
             landsatImageColors: colors
         })
-
-        console.log('done')
     }
 
     decimalToHex(decimal){
@@ -320,9 +340,96 @@ class VegetationDataCollection extends React.Component{
         })
     }
 
+    getModisNdviData(){
+        this.setState({
+            gotModisImage: false,
+            modisResult: 'success',
+        })
+
+        var colors = []
+        for(var i=0; i<this.state.modisImageColors.length; i++){
+            var color = this.state.modisImageColors[i]
+            colors.push(this.rgbToHex(color))
+        }
+        
+        fetch('/api/get_modis_ndvi_image',{
+            method: 'POST',
+            body: JSON.stringify({
+                date: this.state.landsatDate,
+                colors: colors,
+                hor: this.state.modisHorizontal,
+                ver: this.state.modisVertical,
+                acqYear: this.state.modisAcquiredYear,
+                acqDay: this.state.modisAcquiredDay
+            })
+        })
+        .then(res => res.json())
+        .then(response => {
+            if(response['result'] == 'failure'){
+                this.setState({
+                    modisResult: 'failure'
+                })
+            }
+            else{
+                this.setState({
+                    gotModisImage: true,
+                    modisImageUrlRand: response['rand']
+                })
+            }
+        })
+    }
+
+    handleModiImageColorChange(colorNumber, newColor){
+        var colors = this.state.modisImageColors
+        colors[colorNumber] = [newColor.r, newColor.g, newColor.b]
+
+        this.setState({
+            modisImageColors: colors
+        })
+    }
+
+    handleModisHorizontalChange(newHor){
+        if(newHor < 10){
+            newHor = '0' + newHor.toString()
+        }
+        this.setState({
+            modisHorizontal: newHor
+        })
+    }
+
+    handleModisVerticalChange(newVer){
+        if(newVer < 10){
+            newVer = '0' + newVer.toString()
+        }
+        this.setState({
+            modisVertical: newVer
+        })
+    }
+
+    handleModisDateChange(newDate){
+        var dateInfo = newDate.split('-')
+        var year = dateInfo[0] 
+        var month = parseInt(dateInfo[1]) - 1
+        var date = parseInt(dateInfo[2])
+
+        var now = new Date(year, month, date);
+        var start = new Date(now.getFullYear(), 0, 0);
+        var diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+        var oneDay = 1000 * 60 * 60 * 24;
+
+        var dayOfYear = Math.floor(diff / oneDay);
+
+        this.setState({
+            modisAcquiredYear: year,
+            modisAcquiredDay: dayOfYear
+        })
+
+    }
+
     render(){
 
-        var ndvi_indices = ['-1', '-0.5', '-0.2', '0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.8', '1']
+        // var ndvi_indices = ['-1', '-0.5', '-0.2', '0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.8', '1']
+        var ndvi_indices = ['1', '0.8', '0.6', '0.5', '0.4', '0.3', '0.2', '0.1', '0', '-0.2', '-0.5', '-1']
 
         delete L.Icon.Default.prototype._getIconUrl;
         L.Icon.Default.mergeOptions({
@@ -330,8 +437,6 @@ class VegetationDataCollection extends React.Component{
             iconUrl: require('leaflet/dist/images/marker-icon.png'),
             shadowUrl: require('leaflet/dist/images/marker-shadow.png')
         });
-
-        console.log(this.state.landsatImageColors)
 
         return(
             <div className="jumbotron" style={{margin:'10px 0 50px 0', paddingTop:'20px', overflow:'auto'}}>
@@ -352,6 +457,12 @@ class VegetationDataCollection extends React.Component{
                     handleLandsatPathChange = {this.handleLandsatPathChange}
                     handleLandsatRowChange = {this.handleLandsatRowChange}
                     getLandsatData = {this.getLandsatData}
+                    modisHorizontal = {this.state.modisHorizontal}
+                    modisVertical = {this.state.modisVertical}
+                    handleModisHorizontalChange = {this.handleModisHorizontalChange}
+                    handleModisVerticalChange = {this.handleModisVerticalChange}
+                    getModisData = {this.getModisNdviData}
+                    handleModisDateChange = {this.handleModisDateChange}
                 />
                 <div>
                     {
@@ -378,7 +489,7 @@ class VegetationDataCollection extends React.Component{
                                         </div>
                                         :
                                         <div style={{width:'50%', float:'left'}}>
-                                            <img src={'/api/'+this.state.landsatImageUrlRand+'/aws_ndvi_image.png'} alt='ndvi_image' width='100%' style={{border:'1px solid black'}}/>
+                                            <img src={'/api/'+this.state.landsatImageUrlRand+'/landsat_ndvi_image.png'} alt='ndvi_image' width='100%' style={{border:'1px solid black'}}/>
                                         </div>
 
                                     }
@@ -397,6 +508,7 @@ class VegetationDataCollection extends React.Component{
                                                                 r={color[0]} 
                                                                 g={color[1]} 
                                                                 b={color[2]} 
+                                                                dataSource = 'landsat'
                                                                 colorNumber={index}
                                                                 handleLandsatImageColorChange = {this.handleLandsatImageColorChange}/>
                                                         </div>
@@ -407,6 +519,58 @@ class VegetationDataCollection extends React.Component{
 
                                         <button className='btn btn-primary' style={{float:'right'}} onClick={this.getLandsatData}>Update</button>
                                     </div>
+                                </div>
+                                :
+                                this.state.source == 'Modis'?
+                                <div>
+                                    Image for: {this.state.modisAcquiredYear}, Day {this.state.modisAcquiredDay}, Hor. = {this.state.modisHorizontal}, Ver. = {this.state.modisVertical}
+                                    <br/>
+                                    <br/>
+                                    
+                                    {
+                                        this.state.modisResult == 'failure'?
+                                        <div>
+                                            <p style={{color:'red'}}>
+                                                There is no data for this date.
+                                            </p>
+                                        </div>
+                                        :
+                                        this.state.gotModisImage == false?
+                                        <div>
+                                            Loading...
+                                        </div>
+                                        :
+                                        <div style={{width:'50%', float:'left'}}>
+                                            <img src={'/api/'+this.state.modisImageUrlRand+'/modis_ndvi_image.png'} alt='modis_ndvi_image' width='100%' style={{border:'1px solid black'}}/>
+                                        </div>
+
+                                    }
+                                    <div style={{border:'1px solid grey', borderRadius:'5px', float:'right', width:'300px', padding:'16px'}}>
+                                        <h4>Customize NDVI colors</h4>
+                                        <hr/>
+
+                                        {
+                                            this.state.modisImageColors.map((color, index) => {
+                                                return(
+                                                    <div style={{width:'125px', height:'36px'}} key={index}>
+                                                        <div style={{float:'left'}}>{ndvi_indices[index]}:</div>
+                                                        <div style={{float:'right'}}>
+                                                            <ColorPicker 
+                                                                r={color[0]} 
+                                                                g={color[1]} 
+                                                                b={color[2]} 
+                                                                dataSource = 'modis'
+                                                                colorNumber={index}
+                                                                handleModiImageColorChange = {this.handleModiImageColorChange}/>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })
+                                        }
+
+                                        <button className='btn btn-primary' style={{float:'right'}} onClick={this.getModisNdviData}>Update</button>
+                                    </div>
+
                                 </div>
                                 :
                                 this.state.source == 'NCEI'?
