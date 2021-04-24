@@ -58,6 +58,7 @@ class VegetationDataCollection extends React.Component{
             currentMarker: null,
             nceiDate: '2021-01-01',
             usgsDateRange: '2021-03-02 to 2021-03-08',
+
             landsatDate: '20210221_20210221',
             gotLandsatNdviImage: false,
             // color1: ['4','60','48'],
@@ -77,11 +78,11 @@ class VegetationDataCollection extends React.Component{
             ],
             landsatPath: '40',
             landsatRow: '37',
-            landsatResult: 'success',
+            landsatResult: 'failure',
             landsatImageUrlRand: null,
 
             gotModisImage: false,
-            modisResult: 'success',
+            modisResult: 'failure',
             modisImageUrlRand: null,
             modisImageColors: [
                 ['0','0','0'],
@@ -101,7 +102,11 @@ class VegetationDataCollection extends React.Component{
             // modisAcquiredYear: '2018',
             // modisAcquiredDay: '313'
             modisAcquiredYear: '2021',
-            modisAcquiredDay: '1'
+            modisAcquiredDay: '1',
+
+            gotGoesImage: false,
+            goesResult: 'failure',
+            goesUrlRand: null,
 
         }
 
@@ -127,6 +132,7 @@ class VegetationDataCollection extends React.Component{
         this.handleModisVerticalChange = this.handleModisVerticalChange.bind(this);
         this.handleModisDateChange = this.handleModisDateChange.bind(this);
         this.downloadNdviImage = this.downloadNdviImage.bind(this);
+        this.getGoesData = this.getGoesData.bind(this);
     }
 
     componentDidMount(){
@@ -153,7 +159,7 @@ class VegetationDataCollection extends React.Component{
 
         this.getLandsatData()
         this.getModisNdviData()
-
+        this.getGoesData()
     }
 
     formatDate(date) {
@@ -291,8 +297,9 @@ class VegetationDataCollection extends React.Component{
             }
             else{
                 this.setState({
+                    landsatResult: 'success',
                     gotLandsatNdviImage: true,
-                    landsatImageUrlRand: response['rand']
+                    landsatImageUrlRand: Math.floor(Math.random() * 1000000)
                 })
             }
         })
@@ -383,8 +390,9 @@ class VegetationDataCollection extends React.Component{
             }
             else{
                 this.setState({
+                    modisResult: 'success',
                     gotModisImage: true,
-                    modisImageUrlRand: response['rand']
+                    modisImageUrlRand: Math.floor(Math.random() * 1000000)
                 })
             }
         })
@@ -456,6 +464,31 @@ class VegetationDataCollection extends React.Component{
             a.href = url;
             a.download = 'NDVI.TIF';
             a.click(); // triggering it manually
+        })
+    }
+
+    getGoesData(){
+        fetch('/api/get_goes_16_image',{
+            method: 'POST',
+            body: JSON.stringify({
+                test: 'hey'
+            })
+        })
+        .then(res => res.json())
+        .then(response => {
+            if(response['result'] == 'failure'){
+                this.setState({
+                    gotGoesImage: true,
+                    goesResult: 'failure'
+                })
+            }
+            else{
+                this.setState({
+                    goesResult: 'success',
+                    gotGoesImage: true,
+                    goesUrlRand: Math.floor(Math.random() * 1000000)
+                })
+            }
         })
     }
 
@@ -608,6 +641,22 @@ class VegetationDataCollection extends React.Component{
                                         <button className='btn btn-primary' style={{float:'right'}} onClick={this.getModisNdviData}>Update</button>
                                     </div>
 
+                                </div>
+                                :
+                                this.state.source == 'GOES'?
+                                <div>
+                                    <h1>GOES -16</h1>
+                                    {
+                                        this.state.gotGoesImage == false?
+                                        <p>Loading...</p>
+                                        :
+                                        this.state.goesResult == 'failure'?
+                                        <p style={{color: 'red'}}>No image</p>
+                                        :
+                                        <div>
+                                            <img src={'/api/'+this.state.goesUrlRand+'/goes_16_ndvi.png'} width='400px' style={{border:'1px solid black'}}/>
+                                        </div>
+                                    }
                                 </div>
                                 :
                                 this.state.source == 'NCEI'?

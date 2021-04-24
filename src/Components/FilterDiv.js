@@ -152,6 +152,7 @@ class FilterDiv extends React.Component{
                                 <select id="dataSourceInput" style={{padding:'14px'}} onChange={this.changeSource}>
                                     <option value='Landsat'>Landsat</option>
                                     <option value='Modis'>Modis</option>
+                                    <option value='GOES'>GOES-16</option>
                                     <option value='NCEI'>NCEI</option>
                                     <option value='USGS'>USGS</option>
                                 </select>
@@ -258,6 +259,11 @@ class FilterDiv extends React.Component{
                                 
                             </div>
                             :
+                            this.props.dataType == 'vegetation' && this.props.dataSource == 'GOES'?
+                            <div>
+                                skjhdfkj
+                            </div>
+                            :
                             <div>
                                 <div style={{float:'right'}}>
                                     From:&nbsp;
@@ -285,6 +291,9 @@ class FilterDiv extends React.Component{
                         <div></div>
                         :
                         this.props.dataSource == 'Modis' && this.props.dataType == 'vegetation'?
+                        <div></div>
+                        :
+                        this.props.dataSource == 'GOES' && this.props.dataType == 'vegetation'?
                         <div></div>
                         :
                         <div>
