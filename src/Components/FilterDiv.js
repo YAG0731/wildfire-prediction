@@ -261,7 +261,7 @@ class FilterDiv extends React.Component{
                             :
                             this.props.dataType == 'vegetation' && this.props.dataSource == 'GOES'?
                             <div>
-                                skjhdfkj
+                                
                             </div>
                             :
                             <div>
