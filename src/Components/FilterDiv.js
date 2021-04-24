@@ -224,7 +224,7 @@ class FilterDiv extends React.Component{
                             <div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 Date: &nbsp;&nbsp;
-                                <input type='date' defaultValue='2021-02-21' style={{padding:'10px'}} onChange={this.changeLandsatDate}/>
+                                <input type='date' style={{padding:'10px'}} onChange={this.changeLandsatDate}/>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
 
                                 Path: &nbsp;&nbsp;

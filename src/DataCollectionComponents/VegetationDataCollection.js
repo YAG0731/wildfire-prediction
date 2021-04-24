@@ -98,8 +98,10 @@ class VegetationDataCollection extends React.Component{
             ],
             modisHorizontal: '08',
             modisVertical: '05',
-            modisAcquiredYear: '2018',
-            modisAcquiredDay: '313'
+            // modisAcquiredYear: '2018',
+            // modisAcquiredDay: '313'
+            modisAcquiredYear: '2021',
+            modisAcquiredDay: '1'
 
         }
 
@@ -124,6 +126,7 @@ class VegetationDataCollection extends React.Component{
         this.handleModisHorizontalChange = this.handleModisHorizontalChange.bind(this);
         this.handleModisVerticalChange = this.handleModisVerticalChange.bind(this);
         this.handleModisDateChange = this.handleModisDateChange.bind(this);
+        this.downloadNdviImage = this.downloadNdviImage.bind(this);
     }
 
     componentDidMount(){
@@ -351,16 +354,24 @@ class VegetationDataCollection extends React.Component{
             var color = this.state.modisImageColors[i]
             colors.push(this.rgbToHex(color))
         }
+
+        var day = this.state.modisAcquiredDay
+        if(day < 10){
+            day = '00' + day
+        }
+        else if(day < 100){
+            day = '0' + day
+        }
         
         fetch('/api/get_modis_ndvi_image',{
             method: 'POST',
             body: JSON.stringify({
-                date: this.state.landsatDate,
+                // date: this.state.landsatDate,
                 colors: colors,
                 hor: this.state.modisHorizontal,
                 ver: this.state.modisVertical,
                 acqYear: this.state.modisAcquiredYear,
-                acqDay: this.state.modisAcquiredDay
+                acqDay: day
             })
         })
         .then(res => res.json())
@@ -424,6 +435,28 @@ class VegetationDataCollection extends React.Component{
             modisAcquiredDay: dayOfYear
         })
 
+    }
+
+    downloadNdviImage(){
+        // console.log('downloading...')
+        var rand = Math.floor(Math.random() * 1000000);
+        fetch('/api/'+rand+'/download_ndvi')
+        .then(res => res.arrayBuffer())
+        .then(buffer => {
+            // console.log(buffer)
+
+            // 1. create a blob from the byte data
+            const blob = new Blob( [ buffer ] );
+
+            // 2. create blob url
+            const url = URL.createObjectURL(blob);
+
+            // 3. create link to manually click and download the file
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'NDVI.TIF';
+            a.click(); // triggering it manually
+        })
     }
 
     render(){
@@ -526,7 +559,7 @@ class VegetationDataCollection extends React.Component{
                                     Image for: {this.state.modisAcquiredYear}, Day {this.state.modisAcquiredDay}, Hor. = {this.state.modisHorizontal}, Ver. = {this.state.modisVertical}
                                     <br/>
                                     <br/>
-                                    
+
                                     {
                                         this.state.modisResult == 'failure'?
                                         <div>
@@ -542,9 +575,13 @@ class VegetationDataCollection extends React.Component{
                                         :
                                         <div style={{width:'50%', float:'left'}}>
                                             <img src={'/api/'+this.state.modisImageUrlRand+'/modis_ndvi_image.png'} alt='modis_ndvi_image' width='100%' style={{border:'1px solid black'}}/>
+                                            
+                                            <br/><br/>
+                                            <button className='btn btn-secondary' onClick={this.downloadNdviImage}>Download image</button>
                                         </div>
 
                                     }
+
                                     <div style={{border:'1px solid grey', borderRadius:'5px', float:'right', width:'300px', padding:'16px'}}>
                                         <h4>Customize NDVI colors</h4>
                                         <hr/>
