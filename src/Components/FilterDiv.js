@@ -22,6 +22,8 @@ class FilterDiv extends React.Component{
         this.changeModisHorizontal = this.changeModisHorizontal.bind(this);
         this.changeModisVertical = this.changeModisVertical.bind(this);
         this.changeModisDate = this.changeModisDate.bind(this);
+        this.changeGoesDate = this.changeGoesDate.bind(this);
+        this.changeGoesHour = this.changeGoesHour.bind(this);
     }
 
     changeStartDate(event){
@@ -82,6 +84,14 @@ class FilterDiv extends React.Component{
 
     changeModisDate(event){
         this.props.handleModisDateChange(event.target.value)
+    }
+
+    changeGoesDate(event){
+        this.props.handleGoesDateChange(event.target.value)
+    }
+
+    changeGoesHour(event){
+        this.props.handleGoesHourChange(event.target.value)
     }
     
     render(){
@@ -261,7 +271,40 @@ class FilterDiv extends React.Component{
                             :
                             this.props.dataType == 'vegetation' && this.props.dataSource == 'GOES'?
                             <div>
-                                
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                Date: &nbsp;&nbsp;
+                                <input type='date' style={{padding:'10px'}} onChange={this.changeGoesDate}/>
+
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                Hour: &nbsp;&nbsp;
+                                <select style={{padding:'14px'}} onChange={this.changeGoesHour}>
+                                    <option value='0'>0</option>
+                                    <option value='1'>1</option>  
+                                    <option value='2'>2</option> 
+                                    <option value='3'>3</option> 
+                                    <option value='4'>4</option>  
+                                    <option value='5'>5</option> 
+                                    <option value='6'>6</option> 
+                                    <option value='7'>7</option> 
+                                    <option value='8'>8</option> 
+                                    <option value='9'>9</option> 
+                                    <option value='10'>10</option>
+                                    <option value='11'>11</option>
+                                    <option value='12'>12</option>
+                                    <option value='13'>13</option>
+                                    <option value='14'>14</option>  
+                                    <option value='15'>15</option>  
+                                    <option value='16'>16</option>  
+                                    <option value='17'>17</option>  
+                                    <option value='18'>18</option>  
+                                    <option value='19'>19</option>  
+                                    <option value='20'>20</option> 
+                                    <option value='21'>21</option>  
+                                    <option value='22'>22</option>  
+                                    <option value='23'>23</option>   
+                                </select>
+
+                                <button className='btn btn-primary' onClick={this.props.getGoesData} style={{float:'right'}}>Get Data</button>
                             </div>
                             :
                             <div>

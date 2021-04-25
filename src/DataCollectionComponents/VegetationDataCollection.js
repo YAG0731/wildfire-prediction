@@ -107,6 +107,9 @@ class VegetationDataCollection extends React.Component{
             gotGoesImage: false,
             goesResult: 'failure',
             goesUrlRand: null,
+            goesYear: 2020,
+            goesDayOfYear: 257,
+            goesHour: 20
 
         }
 
@@ -132,7 +135,10 @@ class VegetationDataCollection extends React.Component{
         this.handleModisVerticalChange = this.handleModisVerticalChange.bind(this);
         this.handleModisDateChange = this.handleModisDateChange.bind(this);
         this.downloadNdviImage = this.downloadNdviImage.bind(this);
+        this.getDayOfYear = this.getDayOfYear.bind(this);
         this.getGoesData = this.getGoesData.bind(this);
+        this.handleGoesDateChange = this.handleGoesDateChange.bind(this);
+        this.handleGoesHourChange = this.handleGoesHourChange.bind(this);
     }
 
     componentDidMount(){
@@ -425,24 +431,39 @@ class VegetationDataCollection extends React.Component{
         })
     }
 
-    handleModisDateChange(newDate){
-        var dateInfo = newDate.split('-')
+    getDayOfYear(date){
+        var dateInfo = date.split('-')
         var year = dateInfo[0] 
         var month = parseInt(dateInfo[1]) - 1
-        var date = parseInt(dateInfo[2])
+        var day = parseInt(dateInfo[2])
 
-        var now = new Date(year, month, date);
+        var now = new Date(year, month, day);
         var start = new Date(now.getFullYear(), 0, 0);
         var diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
         var oneDay = 1000 * 60 * 60 * 24;
 
         var dayOfYear = Math.floor(diff / oneDay);
+        return dayOfYear
+    }
+
+    handleModisDateChange(newDate){
+        var dateInfo = newDate.split('-')
+        var year = dateInfo[0] 
+        // var month = parseInt(dateInfo[1]) - 1
+        // var date = parseInt(dateInfo[2])
+
+        // var now = new Date(year, month, date);
+        // var start = new Date(now.getFullYear(), 0, 0);
+        // var diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+        // var oneDay = 1000 * 60 * 60 * 24;
+
+        // var dayOfYear = Math.floor(diff / oneDay);
+        var dayOfYear = this.getDayOfYear(newDate)
 
         this.setState({
             modisAcquiredYear: year,
             modisAcquiredDay: dayOfYear
         })
-
     }
 
     downloadNdviImage(){
@@ -468,10 +489,16 @@ class VegetationDataCollection extends React.Component{
     }
 
     getGoesData(){
+        // console.log('getting goes data')
+        this.setState({
+            gotGoesImage: false,
+        })
         fetch('/api/get_goes_16_image',{
             method: 'POST',
             body: JSON.stringify({
-                test: 'hey'
+                year: this.state.goesYear,
+                dayOfYear: this.state.goesDayOfYear,
+                hour: this.state.goesHour
             })
         })
         .then(res => res.json())
@@ -489,6 +516,23 @@ class VegetationDataCollection extends React.Component{
                     goesUrlRand: Math.floor(Math.random() * 1000000)
                 })
             }
+        })
+    }
+
+    handleGoesDateChange(newDate){
+        var dateInfo = newDate.split('-')
+        var year = dateInfo[0] 
+        var dayOfYear = this.getDayOfYear(newDate)
+
+        this.setState({
+            goesYear: year,
+            goesDayOfYear: dayOfYear
+        })
+    }
+
+    handleGoesHourChange(newHour){
+        this.setState({
+            goesHour: newHour
         })
     }
 
@@ -529,6 +573,9 @@ class VegetationDataCollection extends React.Component{
                     handleModisVerticalChange = {this.handleModisVerticalChange}
                     getModisData = {this.getModisNdviData}
                     handleModisDateChange = {this.handleModisDateChange}
+                    handleGoesDateChange = {this.handleGoesDateChange}
+                    handleGoesHourChange = {this.handleGoesHourChange}
+                    getGoesData = {this.getGoesData}
                 />
                 <div>
                     {
@@ -645,7 +692,9 @@ class VegetationDataCollection extends React.Component{
                                 :
                                 this.state.source == 'GOES'?
                                 <div>
-                                    <h1>GOES -16</h1>
+                                    Image for: {this.state.goesYear}, Day {this.state.goesDayOfYear}, Hour {this.state.goesHour}
+                                    <br/>
+                                    <br/>
                                     {
                                         this.state.gotGoesImage == false?
                                         <p>Loading...</p>
@@ -654,7 +703,7 @@ class VegetationDataCollection extends React.Component{
                                         <p style={{color: 'red'}}>No image</p>
                                         :
                                         <div>
-                                            <img src={'/api/'+this.state.goesUrlRand+'/goes_16_ndvi.png'} width='400px' style={{border:'1px solid black'}}/>
+                                            <img src={'/api/'+this.state.goesUrlRand+'/goes_16_ndvi.png'} width='600px' style={{border:'1px solid black'}}/>
                                         </div>
                                     }
                                 </div>
