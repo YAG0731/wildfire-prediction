@@ -16,7 +16,7 @@ class SatelliteDataCollection extends React.Component{
         super(props);
         
         this.state = {
-            source: 'NASA',
+            source: 'MODIS',
             lat: props.lat,
             lon: props.lon,
             currentCounty: 'Alameda',
@@ -29,10 +29,17 @@ class SatelliteDataCollection extends React.Component{
             day: null,
             month: null,
             year: null,
-            nasaImageArea: 'North California',
-            nasaImageColor: 'True Color Composite',
-            nasaImageDate: '2021-03-10',
-            nasaImageUrl: null,
+            modisImageArea: 'North California',
+            modisImageColor: 'True Color Composite',
+            modisImageDate: '2021-03-10',
+            modisImageUrl: null,
+
+            gotGoesImage: false,
+            goesResult: 'failure',
+            goesUrlRand: null,
+            goesYear: 2020,
+            goesDayOfYear: 257,
+            goesHour: 20
         }
 
         this.getData = this.getData.bind(this);
@@ -43,11 +50,15 @@ class SatelliteDataCollection extends React.Component{
         this.handleViewChange = this.handleViewChange.bind(this);
         this.handleMarkerChange = this.handleMarkerChange.bind(this);
         this.handleSourceChange = this.handleSourceChange.bind(this);
-        // this.getNasaData = this.getNasaData.bind(this);
-        this.handleNasaAreaChange = this.handleNasaAreaChange.bind(this);
-        this.handleNasaColorChange = this.handleNasaColorChange.bind(this);
-        this.handleNasaDateChange = this.handleNasaDateChange.bind(this);
-        this.getNasaImageUrl = this.getNasaImageUrl.bind(this);
+        this.handleModisAreaChange = this.handleModisAreaChange.bind(this);
+        this.handleModisColorChange = this.handleModisColorChange.bind(this);
+        this.handleModisDateChange = this.handleModisDateChange.bind(this);
+        this.getModisImageUrl = this.getModisImageUrl.bind(this);
+
+        this.getDayOfYear = this.getDayOfYear.bind(this);
+        this.getGoesData = this.getGoesData.bind(this);
+        this.handleGoesDateChange = this.handleGoesDateChange.bind(this);
+        this.handleGoesHourChange = this.handleGoesHourChange.bind(this);
     }
 
 
@@ -89,6 +100,9 @@ class SatelliteDataCollection extends React.Component{
             startDate: monthAgo,
             endDate: today,
         }, ()=>{this.getData()})
+
+        this.getModisImageUrl()
+        this.getGoesData()
     }
 
     formatDate(date) {
@@ -128,12 +142,7 @@ class SatelliteDataCollection extends React.Component{
             return;
         }
 
-        if(this.state.source === 'USGS'){
-            this.getUSGSdata(startDate, endDate);
-        }
-        else if(this.state.source === 'NASA'){
-            this.getNasaImageUrl();
-        }
+        this.getUSGSdata(startDate, endDate);
     }
 
 
@@ -239,29 +248,29 @@ class SatelliteDataCollection extends React.Component{
         }, () => {this.getData()})
     }
 
-    handleNasaAreaChange(newArea){
+    handleModisAreaChange(newArea){
         this.setState({
-            nasaImageArea: newArea
-        }, () => {this.getNasaImageUrl()})
+            modisImageArea: newArea
+        }, () => {this.getModisImageUrl()})
     }
 
-    handleNasaColorChange(newColor){
+    handleModisColorChange(newColor){
         this.setState({
-            nasaImageColor: newColor
-        }, () => {this.getNasaImageUrl()})
+            modisImageColor: newColor
+        }, () => {this.getModisImageUrl()})
     }
 
-    handleNasaDateChange(newDate){
+    handleModisDateChange(newDate){
         this.setState({
-            nasaImageDate: newDate
-        }, () => {this.getNasaImageUrl()})
+            modisImageDate: newDate
+        }, () => {this.getModisImageUrl()})
     }
 
-    getNasaImageUrl(){
+    getModisImageUrl(){
         var url = 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&&CRS=EPSG:4326&WRAP=DAY&LAYERS='
 
         var height = 800
-        if(this.state.nasaImageColor === 'True Color Composite'){
+        if(this.state.modisImageColor === 'True Color Composite'){
             url += 'MODIS_Terra_CorrectedReflectance_TrueColor'
         }
         else{
@@ -269,17 +278,80 @@ class SatelliteDataCollection extends React.Component{
         }
         url += '&FORMAT=image/jpeg&HEIGHT='+height+'&WIDTH='+height+'&BBOX='
 
-        if(this.state.nasaImageArea === 'North California'){
+        if(this.state.modisImageArea === 'North California'){
             url += '37,-125,42,-120&TIME='
         }
         else{
             url += '32,-122,39,-114&TIME='
         }
-        url += this.state.nasaImageDate
+        url += this.state.modisImageDate
 
         this.setState({
-            nasaImageUrl: url,
+            modisImageUrl: url,
         })
+    }
+
+    getGoesData(){
+        // console.log('getting goes data')
+        this.setState({
+            gotGoesImage: false,
+        })
+        fetch('/api/get_goes_16_image',{
+            method: 'POST',
+            body: JSON.stringify({
+                year: this.state.goesYear,
+                dayOfYear: this.state.goesDayOfYear,
+                hour: this.state.goesHour
+            })
+        })
+        .then(res => res.json())
+        .then(response => {
+            if(response['result'] == 'failure'){
+                this.setState({
+                    gotGoesImage: true,
+                    goesResult: 'failure'
+                })
+            }
+            else{
+                this.setState({
+                    goesResult: 'success',
+                    gotGoesImage: true,
+                    goesUrlRand: Math.floor(Math.random() * 1000000)
+                })
+            }
+        })
+    }
+
+    handleGoesDateChange(newDate){
+        var dateInfo = newDate.split('-')
+        var year = dateInfo[0] 
+        var dayOfYear = this.getDayOfYear(newDate)
+
+        this.setState({
+            goesYear: year,
+            goesDayOfYear: dayOfYear
+        })
+    }
+
+    handleGoesHourChange(newHour){
+        this.setState({
+            goesHour: newHour
+        })
+    }
+
+    getDayOfYear(date){
+        var dateInfo = date.split('-')
+        var year = dateInfo[0] 
+        var month = parseInt(dateInfo[1]) - 1
+        var day = parseInt(dateInfo[2])
+
+        var now = new Date(year, month, day);
+        var start = new Date(now.getFullYear(), 0, 0);
+        var diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+        var oneDay = 1000 * 60 * 60 * 24;
+
+        var dayOfYear = Math.floor(diff / oneDay);
+        return dayOfYear
     }
 
     render(){
@@ -302,10 +374,13 @@ class SatelliteDataCollection extends React.Component{
                     currentView={this.state.currentView}
                     handleViewChange={this.handleViewChange}
                     dataSource = {this.state.source}
-                    handleNasaAreaChange = {this.handleNasaAreaChange}
-                    handleNasaColorChange={this.handleNasaColorChange}
-                    handleNasaDateChange={this.handleNasaDateChange}
+                    handleModisAreaChange = {this.handleModisAreaChange}
+                    handleModisColorChange={this.handleModisColorChange}
+                    handleModisDateChange={this.handleModisDateChange}
                     handleSourceChange={this.handleSourceChange}
+                    handleGoesDateChange = {this.handleGoesDateChange}
+                    handleGoesHourChange = {this.handleGoesHourChange}
+                    getGoesData = {this.getGoesData}
                 />
                 <div>
                     <div>
@@ -313,14 +388,32 @@ class SatelliteDataCollection extends React.Component{
                             this.state.currentView === 'Table View'?
                             <div>
                                 {
-                                    this.state.source == 'NASA'?
+                                    this.state.source == 'MODIS'?
                                     <div>
-                                        <img src={this.state.nasaImageUrl} width='50%' style={{float:'left', border:'1px solid black'}}/>
+                                        <img src={this.state.modisImageUrl} width='50%' style={{float:'left', border:'1px solid black'}}/>
                                         <div style={{float:"right", width:'45%'}}>
-                                            Area: {this.state.nasaImageArea}<br/>
-                                            Bands: {this.state.nasaImageColor}<br/>
-                                            Date: {this.state.nasaImageDate}<br/>
+                                            Area: {this.state.modisImageArea}<br/>
+                                            Bands: {this.state.modisImageColor}<br/>
+                                            Date: {this.state.modisImageDate}<br/>
                                         </div>
+                                    </div>
+                                    :
+                                    this.state.source == 'GOES'?
+                                    <div>
+                                        Image for: {this.state.goesYear}, Day {this.state.goesDayOfYear}, Hour {this.state.goesHour}
+                                        <br/>
+                                        <br/>
+                                        {
+                                            this.state.gotGoesImage == false?
+                                            <p>Loading...</p>
+                                            :
+                                            this.state.goesResult == 'failure'?
+                                            <p style={{color: 'red'}}>No image</p>
+                                            :
+                                            <div>
+                                                <img src={'/api/'+this.state.goesUrlRand+'/goes_16_ndvi.png'} width='600px' style={{border:'1px solid black'}}/>
+                                            </div>
+                                        }
                                     </div>
                                     :
                                     !this.state.data?

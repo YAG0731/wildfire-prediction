@@ -136,9 +136,9 @@ class VegetationDataCollection extends React.Component{
         this.handleModisDateChange = this.handleModisDateChange.bind(this);
         this.downloadNdviImage = this.downloadNdviImage.bind(this);
         this.getDayOfYear = this.getDayOfYear.bind(this);
-        this.getGoesData = this.getGoesData.bind(this);
-        this.handleGoesDateChange = this.handleGoesDateChange.bind(this);
-        this.handleGoesHourChange = this.handleGoesHourChange.bind(this);
+        // this.getGoesData = this.getGoesData.bind(this);
+        // this.handleGoesDateChange = this.handleGoesDateChange.bind(this);
+        // this.handleGoesHourChange = this.handleGoesHourChange.bind(this);
     }
 
     componentDidMount(){
@@ -165,7 +165,7 @@ class VegetationDataCollection extends React.Component{
 
         this.getLandsatData()
         this.getModisNdviData()
-        this.getGoesData()
+        // this.getGoesData()
     }
 
     formatDate(date) {
@@ -488,53 +488,53 @@ class VegetationDataCollection extends React.Component{
         })
     }
 
-    getGoesData(){
-        // console.log('getting goes data')
-        this.setState({
-            gotGoesImage: false,
-        })
-        fetch('/api/get_goes_16_image',{
-            method: 'POST',
-            body: JSON.stringify({
-                year: this.state.goesYear,
-                dayOfYear: this.state.goesDayOfYear,
-                hour: this.state.goesHour
-            })
-        })
-        .then(res => res.json())
-        .then(response => {
-            if(response['result'] == 'failure'){
-                this.setState({
-                    gotGoesImage: true,
-                    goesResult: 'failure'
-                })
-            }
-            else{
-                this.setState({
-                    goesResult: 'success',
-                    gotGoesImage: true,
-                    goesUrlRand: Math.floor(Math.random() * 1000000)
-                })
-            }
-        })
-    }
+    // getGoesData(){
+    //     // console.log('getting goes data')
+    //     this.setState({
+    //         gotGoesImage: false,
+    //     })
+    //     fetch('/api/get_goes_16_image',{
+    //         method: 'POST',
+    //         body: JSON.stringify({
+    //             year: this.state.goesYear,
+    //             dayOfYear: this.state.goesDayOfYear,
+    //             hour: this.state.goesHour
+    //         })
+    //     })
+    //     .then(res => res.json())
+    //     .then(response => {
+    //         if(response['result'] == 'failure'){
+    //             this.setState({
+    //                 gotGoesImage: true,
+    //                 goesResult: 'failure'
+    //             })
+    //         }
+    //         else{
+    //             this.setState({
+    //                 goesResult: 'success',
+    //                 gotGoesImage: true,
+    //                 goesUrlRand: Math.floor(Math.random() * 1000000)
+    //             })
+    //         }
+    //     })
+    // }
 
-    handleGoesDateChange(newDate){
-        var dateInfo = newDate.split('-')
-        var year = dateInfo[0] 
-        var dayOfYear = this.getDayOfYear(newDate)
+    // handleGoesDateChange(newDate){
+    //     var dateInfo = newDate.split('-')
+    //     var year = dateInfo[0] 
+    //     var dayOfYear = this.getDayOfYear(newDate)
 
-        this.setState({
-            goesYear: year,
-            goesDayOfYear: dayOfYear
-        })
-    }
+    //     this.setState({
+    //         goesYear: year,
+    //         goesDayOfYear: dayOfYear
+    //     })
+    // }
 
-    handleGoesHourChange(newHour){
-        this.setState({
-            goesHour: newHour
-        })
-    }
+    // handleGoesHourChange(newHour){
+    //     this.setState({
+    //         goesHour: newHour
+    //     })
+    // }
 
     render(){
 
@@ -573,9 +573,9 @@ class VegetationDataCollection extends React.Component{
                     handleModisVerticalChange = {this.handleModisVerticalChange}
                     getModisData = {this.getModisNdviData}
                     handleModisDateChange = {this.handleModisDateChange}
-                    handleGoesDateChange = {this.handleGoesDateChange}
-                    handleGoesHourChange = {this.handleGoesHourChange}
-                    getGoesData = {this.getGoesData}
+                    // handleGoesDateChange = {this.handleGoesDateChange}
+                    // handleGoesHourChange = {this.handleGoesHourChange}
+                    // getGoesData = {this.getGoesData}
                 />
                 <div>
                     {
@@ -657,7 +657,7 @@ class VegetationDataCollection extends React.Component{
                                             <img src={'/api/'+this.state.modisImageUrlRand+'/modis_ndvi_image.png'} alt='modis_ndvi_image' width='100%' style={{border:'1px solid black'}}/>
                                             
                                             <br/><br/>
-                                            <button className='btn btn-secondary' onClick={this.downloadNdviImage}>Download image</button>
+                                            <button className='btn btn-secondary' onClick={this.downloadNdviImage}>Download .TIF file</button>
                                         </div>
 
                                     }
@@ -690,24 +690,24 @@ class VegetationDataCollection extends React.Component{
 
                                 </div>
                                 :
-                                this.state.source == 'GOES'?
-                                <div>
-                                    Image for: {this.state.goesYear}, Day {this.state.goesDayOfYear}, Hour {this.state.goesHour}
-                                    <br/>
-                                    <br/>
-                                    {
-                                        this.state.gotGoesImage == false?
-                                        <p>Loading...</p>
-                                        :
-                                        this.state.goesResult == 'failure'?
-                                        <p style={{color: 'red'}}>No image</p>
-                                        :
-                                        <div>
-                                            <img src={'/api/'+this.state.goesUrlRand+'/goes_16_ndvi.png'} width='600px' style={{border:'1px solid black'}}/>
-                                        </div>
-                                    }
-                                </div>
-                                :
+                                // this.state.source == 'GOES'?
+                                // <div>
+                                //     Image for: {this.state.goesYear}, Day {this.state.goesDayOfYear}, Hour {this.state.goesHour}
+                                //     <br/>
+                                //     <br/>
+                                //     {
+                                //         this.state.gotGoesImage == false?
+                                //         <p>Loading...</p>
+                                //         :
+                                //         this.state.goesResult == 'failure'?
+                                //         <p style={{color: 'red'}}>No image</p>
+                                //         :
+                                //         <div>
+                                //             <img src={'/api/'+this.state.goesUrlRand+'/goes_16_ndvi.png'} width='600px' style={{border:'1px solid black'}}/>
+                                //         </div>
+                                //     }
+                                // </div>
+                                // :
                                 this.state.source == 'NCEI'?
                                 <div>
                                     NDVI:

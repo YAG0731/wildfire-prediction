@@ -11,9 +11,9 @@ class FilterDiv extends React.Component{
         this.changeEndDate = this.changeEndDate.bind(this);
         this.changeSource = this.changeSource.bind(this);
         this.changeWrccStation = this.changeWrccStation.bind(this);
-        this.changeNasaDate = this.changeNasaDate.bind(this);
-        this.changeNasaArea = this.changeNasaArea.bind(this);
-        this.changeNasaColor = this.changeNasaColor.bind(this);
+        this.changeModisDate = this.changeModisDate.bind(this);
+        this.changeModisArea = this.changeModisArea.bind(this);
+        this.changeModisColor = this.changeModisColor.bind(this);
         this.changeNceiDate = this.changeNceiDate.bind(this);
         this.changeUsgsDate = this.changeUsgsDate.bind(this);
         this.changeLandsatDate = this.changeLandsatDate.bind(this);
@@ -42,16 +42,16 @@ class FilterDiv extends React.Component{
         this.props.handleWrccStationChange(station);
     }
 
-    changeNasaArea(event){
-        this.props.handleNasaAreaChange(event.target.value)
+    changeModisArea(event){
+        this.props.handleModisAreaChange(event.target.value)
     }
 
-    changeNasaColor(event){
-        this.props.handleNasaColorChange(event.target.value)
+    changeModisColor(event){
+        this.props.handleModisColorChange(event.target.value)
     }
 
-    changeNasaDate(event){
-        this.props.handleNasaDateChange(event.target.value)
+    changeModisDate(event){
+        this.props.handleModisDateChange(event.target.value)
     }
 
     changeNceiDate(event){
@@ -162,14 +162,15 @@ class FilterDiv extends React.Component{
                                 <select id="dataSourceInput" style={{padding:'14px'}} onChange={this.changeSource}>
                                     <option value='Landsat'>Landsat</option>
                                     <option value='Modis'>Modis</option>
-                                    <option value='GOES'>GOES-16</option>
+                                    {/* <option value='GOES'>GOES-16</option> */}
                                     <option value='NCEI'>NCEI</option>
                                     <option value='USGS'>USGS</option>
                                 </select>
                                 :
                                 this.props.dataType === 'satellite'?
                                 <select id="dataSourceInput" style={{padding:'14px'}} onChange={this.changeSource}>
-                                    <option value='NASA'>NASA</option>
+                                    <option value='MODIS'>MODIS</option>
+                                    <option value='GOES'>GOES-16</option>
                                     <option value='USGS'>USGS</option>
                                 </select>
                                 :
@@ -212,22 +213,22 @@ class FilterDiv extends React.Component{
                                 <WrccStationSelector handleChange={this.changeWrccStation}/>
                             </div>
                             :
-                            this.props.dataSource == 'NASA'?
+                            this.props.dataSource == 'MODIS'?
                             <div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <select style={{padding:'14px'}} onChange={this.changeNasaArea}>
+                                <select style={{padding:'14px'}} onChange={this.changeModisArea}>
                                     <option value='North California'>North California</option>
                                     <option value='South California'>South California</option>
                                 </select>
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-                                <select style={{padding:'14px'}} onChange={this.changeNasaColor}>
+                                <select style={{padding:'14px'}} onChange={this.changeModisColor}>
                                     <option value='True Color Composite'>True Color Composite</option>
                                     <option value='False Color Composite'>False Color Composite</option>
                                 </select>
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-                                <input type='date' style={{padding:'10px'}} onChange={this.changeNasaDate}/>
+                                <input type='date' style={{padding:'10px'}} onChange={this.changeModisDate}/>
                                 <br/>
                             </div>
                             :
@@ -269,7 +270,7 @@ class FilterDiv extends React.Component{
                                 
                             </div>
                             :
-                            this.props.dataType == 'vegetation' && this.props.dataSource == 'GOES'?
+                            this.props.dataType == 'satellite' && this.props.dataSource == 'GOES'?
                             <div>
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 Date: &nbsp;&nbsp;
@@ -324,7 +325,7 @@ class FilterDiv extends React.Component{
 
                     </div>
                     {
-                        this.props.dataSource == 'WRCC' || this.props.dataSource == 'NASA' || this.props.dataSource == 'NCEI'?
+                        this.props.dataSource == 'WRCC' || this.props.dataSource == 'MODIS' || this.props.dataSource == 'NCEI'?
                         <div></div>
                         :
                         this.props.dataSource == 'USGS' && this.props.dataType == 'vegetation'?
@@ -336,7 +337,7 @@ class FilterDiv extends React.Component{
                         this.props.dataSource == 'Modis' && this.props.dataType == 'vegetation'?
                         <div></div>
                         :
-                        this.props.dataSource == 'GOES' && this.props.dataType == 'vegetation'?
+                        this.props.dataSource == 'GOES' && this.props.dataType == 'satellite'?
                         <div></div>
                         :
                         <div>
