@@ -3,8 +3,9 @@ import MyNavbar from './Components/MyNavbar';
 
 import WeatherDataAnalysis from './DataAnalysisComponents/WeatherDataAnalysis';
 import FireHistoryDataAnalysis from './DataAnalysisComponents/FireHistoryDataAnalysis';
-import LandCoverDataAnalysis from './DataAnalysisComponents/LandCoverDataAnalysis';
+import VegetationDataAnalysis from './DataAnalysisComponents/VegetationDataAnalysis';
 import SatelliteDataAnalysis from './DataAnalysisComponents/SatelliteDataAnalysis';
+import LightningDataCollection from './DataCollectionComponents/LightningDataCollection';
 
 class DataAnalysis extends React.Component{
 
@@ -18,7 +19,8 @@ class DataAnalysis extends React.Component{
             weatherComponent: null,
             satelliteComponent: null,
             fireHistoryComponent: null,
-            landCoverComponent: null,
+            vegetationComponent: null,
+            lightningComponent: null,
         }
 
         this.getCoordinates = this.getCoordinates.bind(this);
@@ -35,8 +37,9 @@ class DataAnalysis extends React.Component{
         this.setState({
             weatherComponent: <WeatherDataAnalysis lat={this.state.lat} lon={this.state.lon} />,
             fireHistoryComponent: <FireHistoryDataAnalysis lat={this.state.lat} lon={this.state.lon} />,
-            landCoverComponent: <LandCoverDataAnalysis lat={this.state.lat} lon={this.state.lon} />,
-            satelliteComponent: <SatelliteDataAnalysis lat={this.state.lat} lon={this.state.lon} />
+            vegetationComponent: <VegetationDataAnalysis lat={this.state.lat} lon={this.state.lon} />,
+            satelliteComponent: <SatelliteDataAnalysis lat={this.state.lat} lon={this.state.lon} />,
+            lightningComponent: <LightningDataCollection lat={this.state.lat} lon={this.state.lon} />
         })
     }
 
@@ -58,7 +61,7 @@ class DataAnalysis extends React.Component{
 
         var styles = {
             buttonGroupButton: {
-                width: '20%',
+                width: '15%',
                 backgroundColor: '#f0f0f0', 
                 border: '1px solid grey',
                 padding: '10px 24px', 
@@ -70,7 +73,7 @@ class DataAnalysis extends React.Component{
                 height:'46px'
             },
             buttonGroupButtonActive: {
-                width: '20%',
+                width: '15%',
                 backgroundColor: '#1580fb', 
                 border: '1px solid #1580fb',
                 color: 'white', 
@@ -110,16 +113,22 @@ class DataAnalysis extends React.Component{
                                     <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Fire History</button>
                                 }
                                 {
-                                    this.state.currentMode === 'Land Cover'?
-                                    <button style={styles.buttonGroupButtonActive}>Land Cover</button>
+                                    this.state.currentMode === 'Vegetation'?
+                                    <button style={styles.buttonGroupButtonActive}>Vegetation</button>
                                     :
-                                    <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Land Cover</button>
+                                    <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Vegetation</button>
                                 }
                                 {
                                     this.state.currentMode === 'Satellite'?
                                     <button style={styles.buttonGroupButtonActive}>Satellite</button>
                                     :
                                     <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Satellite</button>
+                                }
+                                {
+                                    this.state.currentMode === 'Lightning'?
+                                    <button style={styles.buttonGroupButtonActive}>Lightning</button>
+                                    :
+                                    <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Lightning</button>
                                 }
                             </div>
 
@@ -142,8 +151,14 @@ class DataAnalysis extends React.Component{
                                 <div></div>
                             }
                             {
-                                this.state.currentMode === 'Land Cover'?
-                                this.state.landCoverComponent
+                                this.state.currentMode === 'Vegetation'?
+                                this.state.vegetationComponent
+                                :
+                                <div></div>
+                            }
+                            {
+                                this.state.currentMode === 'Lightning'?
+                                this.state.lightningComponent
                                 :
                                 <div></div>
                             }

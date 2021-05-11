@@ -13,7 +13,7 @@ import counties from '../counties.json';
 const devUrl = '';
 const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
 
-class LandCoverDataAnalysis extends React.Component{
+class VegetationDataAnalysis extends React.Component{
 
     constructor(props){
         super(props);
@@ -238,7 +238,7 @@ class LandCoverDataAnalysis extends React.Component{
 
                 <FilterDiv 
                     pageType='dataAnalysis'
-                    dataType='landCover'
+                    dataType='vegetation'
                     getData={this.getData}
                     changeCounty={this.changeCounty}
                     toggleFilterDiv={this.toggleFilterDiv}
@@ -357,4 +357,4 @@ class LandCoverDataAnalysis extends React.Component{
     }
 }
 
-export default LandCoverDataAnalysis;
+export default VegetationDataAnalysis;

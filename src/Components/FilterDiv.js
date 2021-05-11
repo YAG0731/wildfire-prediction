@@ -22,8 +22,15 @@ class FilterDiv extends React.Component{
         this.changeModisHorizontal = this.changeModisHorizontal.bind(this);
         this.changeModisVertical = this.changeModisVertical.bind(this);
         this.changeModisDate = this.changeModisDate.bind(this);
+        
+        // GOES for NDVI
         this.changeGoesDate = this.changeGoesDate.bind(this);
         this.changeGoesHour = this.changeGoesHour.bind(this);
+
+        // GOES for lightning
+        this.changeGoesLightningDate = this.changeGoesLightningDate.bind(this);
+        this.changeGoesLightningTime = this.changeGoesLightningTime.bind(this);
+
     }
 
     changeStartDate(event){
@@ -93,6 +100,14 @@ class FilterDiv extends React.Component{
     changeGoesHour(event){
         this.props.handleGoesHourChange(event.target.value)
     }
+
+    changeGoesLightningDate(event){
+        this.props.handleGoesDateChange(event.target.value)
+    }
+
+    changeGoesLightningTime(event){
+        this.props.handleGoesTimeChange(event.target.value)
+    }
     
     render(){
         return(
@@ -111,6 +126,9 @@ class FilterDiv extends React.Component{
                             :
                             this.props.dataType === 'satellite'?
                             'Satellite'
+                            :
+                            this.props.dataType === 'lightning'?
+                            'Lightning'
                             :
                             <div></div>
                         }
@@ -172,6 +190,11 @@ class FilterDiv extends React.Component{
                                     <option value='MODIS'>MODIS</option>
                                     <option value='GOES'>GOES-16</option>
                                     <option value='USGS'>USGS</option>
+                                </select>
+                                :
+                                this.props.dataType === 'lightning'?
+                                <select style={{padding:'14px'}}>
+                                    <option value='GOES'>GOES-16</option>
                                 </select>
                                 :
                                 <div></div>
@@ -308,6 +331,19 @@ class FilterDiv extends React.Component{
                                 <button className='btn btn-primary' onClick={this.props.getGoesData} style={{float:'right'}}>Get Data</button>
                             </div>
                             :
+                            this.props.dataType == 'lightning' && this.props.dataSource == 'GOES'?
+                            <div>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                Date: &nbsp;&nbsp;
+                                <input type='date' style={{padding:'10px'}} onChange={this.changeGoesLightningDate} />
+
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                Time: &nbsp;&nbsp;
+                                <input type='time' style={{padding:'10px'}} onChange={this.changeGoesLightningTime} />
+
+                                <button className='btn btn-primary'  style={{float:'right'}} onClick={this.props.getGoesLightningData}>Get Data</button>
+                            </div>
+                            :
                             <div>
                                 <div style={{float:'right'}}>
                                     From:&nbsp;
@@ -338,6 +374,9 @@ class FilterDiv extends React.Component{
                         <div></div>
                         :
                         this.props.dataSource == 'GOES' && this.props.dataType == 'satellite'?
+                        <div></div>
+                        :
+                        this.props.dataSource == 'GOES' && this.props.dataType == 'lightning'?
                         <div></div>
                         :
                         <div>

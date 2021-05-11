@@ -5,6 +5,7 @@ import WeatherDataCollection from './DataCollectionComponents/WeatherDataCollect
 import SatelliteDataCollection from './DataCollectionComponents/SatelliteDataCollection';
 import FireHistoryDataCollection from './DataCollectionComponents/FireHistoryDataCollection';
 import VegetationDataCollection from './DataCollectionComponents/VegetationDataCollection';
+import LightningDataCollection from './DataCollectionComponents/LightningDataCollection';
 
 class DataCollection extends React.Component{
 
@@ -19,6 +20,7 @@ class DataCollection extends React.Component{
             satelliteComponent: null,
             fireHistoryComponent: null,
             vegetationComponent: null,
+            lightningComponent: null,
         }
 
         this.getCoordinates = this.getCoordinates.bind(this);
@@ -38,6 +40,7 @@ class DataCollection extends React.Component{
             satelliteComponent: <SatelliteDataCollection lat={this.state.lat} lon={this.state.lon}/>,
             fireHistoryComponent: <FireHistoryDataCollection lat={this.state.lat} lon={this.state.lon}/>,
             vegetationComponent: <VegetationDataCollection lat={this.state.lat} lon={this.state.lon}/>,
+            lightningComponent: <LightningDataCollection lat={this.state.lat} lon={this.state.lon} />
         })
     }
 
@@ -59,7 +62,7 @@ class DataCollection extends React.Component{
     render(){
         var styles = {
             buttonGroupButton: {
-                width: '20%',
+                width: '15%',
                 backgroundColor: '#f0f0f0', 
                 border: '1px solid grey',
                 padding: '10px 24px', 
@@ -70,7 +73,7 @@ class DataCollection extends React.Component{
                 outline:'none'
             },
             buttonGroupButtonActive: {
-                width: '20%',
+                width: '15%',
                 backgroundColor: '#1580fb', 
                 border: '1px solid #1580fb',
                 color: 'white', 
@@ -121,6 +124,12 @@ class DataCollection extends React.Component{
                                     :
                                     <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Satellite</button>
                                 }
+                                {
+                                    this.state.currentMode === 'Lightning'?
+                                    <button style={styles.buttonGroupButtonActive}>Lightning</button>
+                                    :
+                                    <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Lightning</button>
+                                }
                             </div>
 
                             {
@@ -144,6 +153,12 @@ class DataCollection extends React.Component{
                             {
                                 this.state.currentMode === 'Vegetation'?
                                 this.state.vegetationComponent
+                                :
+                                <div></div>
+                            }
+                            {
+                                this.state.currentMode === 'Lightning'?
+                                this.state.lightningComponent
                                 :
                                 <div></div>
                             }
