@@ -39,7 +39,8 @@ class SatelliteDataCollection extends React.Component{
             goesUrlRand: null,
             goesYear: 2020,
             goesDayOfYear: 257,
-            goesHour: 20
+            goesHour: 20,
+            goesColorComposite: 'true color composite'
         }
 
         this.getData = this.getData.bind(this);
@@ -59,6 +60,7 @@ class SatelliteDataCollection extends React.Component{
         this.getGoesData = this.getGoesData.bind(this);
         this.handleGoesDateChange = this.handleGoesDateChange.bind(this);
         this.handleGoesHourChange = this.handleGoesHourChange.bind(this);
+        this.handleGoesColorCompositeChange = this.handleGoesColorCompositeChange.bind(this);
     }
 
 
@@ -301,7 +303,8 @@ class SatelliteDataCollection extends React.Component{
             body: JSON.stringify({
                 year: this.state.goesYear,
                 dayOfYear: this.state.goesDayOfYear,
-                hour: this.state.goesHour
+                hour: this.state.goesHour,
+                colorComposite: this.state.goesColorComposite
             })
         })
         .then(res => res.json())
@@ -336,6 +339,12 @@ class SatelliteDataCollection extends React.Component{
     handleGoesHourChange(newHour){
         this.setState({
             goesHour: newHour
+        })
+    }
+
+    handleGoesColorCompositeChange(colorComposite){
+        this.setState({
+            goesColorComposite: colorComposite
         })
     }
 
@@ -381,6 +390,7 @@ class SatelliteDataCollection extends React.Component{
                     handleGoesDateChange = {this.handleGoesDateChange}
                     handleGoesHourChange = {this.handleGoesHourChange}
                     getGoesData = {this.getGoesData}
+                    handleGoesColorCompositeChange = {this.handleGoesColorCompositeChange}
                 />
                 <div>
                     <div>
@@ -405,13 +415,16 @@ class SatelliteDataCollection extends React.Component{
                                         <br/>
                                         {
                                             this.state.gotGoesImage == false?
-                                            <p>Loading...</p>
+                                            <div>
+                                                <p>Loading...</p>
+                                                <p>This may take a few minutes.</p>
+                                            </div>
                                             :
                                             this.state.goesResult == 'failure'?
                                             <p style={{color: 'red'}}>No image</p>
                                             :
                                             <div>
-                                                <img src={'/api/'+this.state.goesUrlRand+'/goes_16_ndvi.png'} width='600px' style={{border:'1px solid black'}}/>
+                                                <img src={'/api/'+this.state.goesUrlRand+'/goes_16.png'} width='600px' style={{border:'1px solid black'}}/>
                                             </div>
                                         }
                                     </div>

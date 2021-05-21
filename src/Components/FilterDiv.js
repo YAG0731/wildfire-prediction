@@ -23,9 +23,10 @@ class FilterDiv extends React.Component{
         this.changeModisVertical = this.changeModisVertical.bind(this);
         this.changeModisDate = this.changeModisDate.bind(this);
         
-        // GOES for NDVI
+        // GOES for Satellite
         this.changeGoesDate = this.changeGoesDate.bind(this);
         this.changeGoesHour = this.changeGoesHour.bind(this);
+        this.changeGoesColorComposite = this.changeGoesColorComposite.bind(this);
 
         // GOES for lightning
         this.changeGoesLightningDate = this.changeGoesLightningDate.bind(this);
@@ -108,6 +109,10 @@ class FilterDiv extends React.Component{
     changeGoesLightningTime(event){
         this.props.handleGoesTimeChange(event.target.value)
     }
+
+    changeGoesColorComposite(event){
+        this.props.handleGoesColorCompositeChange(event.target.value)
+    }
     
     render(){
         return(
@@ -161,7 +166,7 @@ class FilterDiv extends React.Component{
                 <hr/>
 
                 <div style={{display:'none', height:'auto'}} id='filterDiv'>
-                    <div style={{width:'100%'}}>
+                    <div style={{width:'100%', display:'block', overflow:'auto'}}>
                         <div style={{float:'left'}}>
                             Source: &nbsp;&nbsp;
                             {
@@ -294,9 +299,9 @@ class FilterDiv extends React.Component{
                             </div>
                             :
                             this.props.dataType == 'satellite' && this.props.dataSource == 'GOES'?
-                            <div>
+                            <div style={{display:'block', overflow:'auto'}}>
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                Date: &nbsp;&nbsp;
+                                {/* Date: &nbsp;&nbsp; */}
                                 <input type='date' style={{padding:'10px'}} onChange={this.changeGoesDate}/>
 
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -328,6 +333,12 @@ class FilterDiv extends React.Component{
                                     <option value='23'>23</option>   
                                 </select>
 
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <select style={{padding:'14px'}} onChange={this.changeGoesColorComposite}>
+                                    <option value='true color composite'>True Color Composite</option>
+                                    <option value='false color composite'>False Color Composite</option>
+                                </select>
+
                                 <button className='btn btn-primary' onClick={this.props.getGoesData} style={{float:'right'}}>Get Data</button>
                             </div>
                             :
@@ -342,6 +353,7 @@ class FilterDiv extends React.Component{
                                 <input type='time' style={{padding:'10px'}} onChange={this.changeGoesLightningTime} />
 
                                 <button className='btn btn-primary'  style={{float:'right'}} onClick={this.props.getGoesLightningData}>Get Data</button>
+                                
                             </div>
                             :
                             <div>
