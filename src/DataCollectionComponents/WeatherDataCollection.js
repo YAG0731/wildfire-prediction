@@ -12,8 +12,8 @@ import counties from '../counties.json';
 import BlueDot from '../images/blueDot.svg';
 import StationIcon from '../images/satellite.png';
 
-const devUrl = '';
-const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
+// const devUrl = '';
+// const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
 
 const myIcon = L.icon({
     iconUrl: BlueDot,
@@ -24,6 +24,11 @@ const stationIcon = L.icon({
     iconUrl: StationIcon,
     iconSize: [36, 36],
 })
+
+var base_url = '';
+if(process.env.REACT_APP_ENVIRONMENT === 'prod'){
+    base_url = 'https://wildfire-ml-flask.herokuapp.com'
+}
 
 class WeatherDataCollection extends React.Component{
 
@@ -169,7 +174,7 @@ class WeatherDataCollection extends React.Component{
 
         // console.log('date: '+this.state.day+'/'+this.state.month+'/'+this.state.year)
 
-        fetch('/api/getWrccData', {
+        fetch(base_url + '/api/getWrccData', {
             method: 'POST',
             body: JSON.stringify({
                 url: wrcc_url,
@@ -227,7 +232,7 @@ class WeatherDataCollection extends React.Component{
             noaaData: null,
         })
 
-        fetch(prodUrl + '/api/getNOAAdata', {
+        fetch(base_url + '/api/getNOAAdata', {
             method:'POST',
             body: JSON.stringify({
                 startDate: start,

@@ -24,6 +24,8 @@ class WildfireDetection extends React.Component {
       imageColor: 'True Color Composite',
       date: null,
       gotInputImage: false,
+      detectScoreCompleted: false,
+      detectFireCompleted: false,
     };
 
     this.getFile = this.getFile.bind(this)
@@ -107,6 +109,11 @@ class WildfireDetection extends React.Component {
   // which include detection boxes, scores, and classifications
   async detectScore() {
     console.log('running detect score')
+    this.setState({
+      detectScoreCompleted: false,
+      // loading: true,
+    })
+
     // Fetch request to wpp module
     fetch('https://wpp-fire-detection-ml.herokuapp.com/result', {
       method: 'POST'
@@ -148,6 +155,9 @@ class WildfireDetection extends React.Component {
         const detectionClasses = res.data.predictions[0].detection_classes;
 
         this.setDetectionInfo(detectionBoxes, detectionScores, detectionClasses);
+        this.setState({
+          detectScoreCompleted: true
+        })
       })
     })
     .catch(error => console.log("ERROR:", error));
@@ -180,6 +190,9 @@ class WildfireDetection extends React.Component {
   // Comsumes the ReadableStream from the Fetch call
   async detectFire() {
     console.log('running detect fire')
+    this.setState({
+      detectFireCompleted: false
+    })
 
     const formData = new FormData();
     formData.append('file', this.state.selectedFile);
@@ -191,7 +204,7 @@ class WildfireDetection extends React.Component {
     })
     .then(res => {
       // Start loading
-      //this.setState({ loading: true });
+      this.setState({ loading: true });
 
       console.log(res)
 
@@ -225,7 +238,8 @@ class WildfireDetection extends React.Component {
       // set the state of Fire Image URL to the made url
       this.setState({
         fireImgUrl: url,
-        loading: false
+        loading: false,
+        // detectFireCompleted: true,
       });
     })
     .catch(err => console.error(err));
@@ -298,6 +312,15 @@ class WildfireDetection extends React.Component {
                 </div>
                 <hr/>
 
+                {/* <input type='file' className="form-control" onChange={this.onFileChange} /> */}
+                <div class="custom-file" style={{width:'60%'}}>
+                  <input type="file" class="custom-file-input" id="validatedCustomFile" required onChange={this.onFileChange} />
+                  <label class="custom-file-label" for="validatedCustomFile">Choose file...</label>
+                  <div class="invalid-feedback">Example invalid custom file feedback</div>
+                </div>
+                <br/>
+                <br/>
+
                 <div style={{border:'1px solid grey', borderRadius:'10px', padding:'10px', width:'60%'}}>
                   <h5 style={{fontWeight:'bold'}}>Input Image:</h5>
                   <hr/>
@@ -317,17 +340,33 @@ class WildfireDetection extends React.Component {
                 <div style={{border:'1px solid grey', borderRadius:'10px', padding:'10px', width:'60%', float:'left', marginBottom:'40px'}}>
                   <h5 style={{fontWeight:'bold'}}>Output Image</h5>
                   <hr/>
-                  <DetectionImage url={this.state.fireImgUrl} loading={this.state.loading} />
+                  {
+                    this.state.loading?
+                    <div>Loading...</div>
+                    :
+                    <DetectionImage url={this.state.fireImgUrl} loading={this.state.loading} />
+                  }
+                  {/* <DetectionImage url={this.state.fireImgUrl} loading={this.state.loading} /> */}
                 </div>
 
                 <div style={{border:'1px solid grey', borderRadius:'10px', padding:'10px', width:'38%', float:'right'}}>
                   <h5 style={{fontWeight:'bold'}}>Detection List</h5>
                   <hr/>
-                  <DetectionList
+                  {
+                    !this.state.loading?
+                    <DetectionList
+                      boxes={this.state.bounding_boxes}
+                      scores={this.state.detection_scores}
+                      classes={this.state.detection_classes}
+                    />
+                    :
+                    <div></div>
+                  }
+                  {/* <DetectionList
                     boxes={this.state.bounding_boxes}
                     scores={this.state.detection_scores}
                     classes={this.state.detection_classes}
-                  />
+                  /> */}
                 </div>
 
               </div>

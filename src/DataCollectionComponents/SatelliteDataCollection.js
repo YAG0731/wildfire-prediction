@@ -7,8 +7,13 @@ import L from 'leaflet';
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import FilterDiv from '../Components/FilterDiv';
 
-const devUrl = '';
-const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
+// const devUrl = '';
+// const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
+
+var base_url = ''
+if(process.env.REACT_APP_ENVIRONMENT === 'prod'){
+    base_url = 'https://wildfire-ml-flask.herokuapp.com'
+}
 
 class SatelliteDataCollection extends React.Component{
 
@@ -40,7 +45,9 @@ class SatelliteDataCollection extends React.Component{
             goesYear: 2020,
             goesDayOfYear: 257,
             goesHour: 20,
-            goesColorComposite: 'true color composite'
+            goesColorComposite: 'true color composite',
+            selectedGoesImageType:'Image',
+            retrievedGoesImageType: 'Image',
         }
 
         this.getData = this.getData.bind(this);
@@ -61,6 +68,7 @@ class SatelliteDataCollection extends React.Component{
         this.handleGoesDateChange = this.handleGoesDateChange.bind(this);
         this.handleGoesHourChange = this.handleGoesHourChange.bind(this);
         this.handleGoesColorCompositeChange = this.handleGoesColorCompositeChange.bind(this);
+        this.handleGoesImageTypeChange = this.handleGoesImageTypeChange.bind(this);
     }
 
 
@@ -152,7 +160,7 @@ class SatelliteDataCollection extends React.Component{
         var lat = this.state.lat;
         var lon = this.state.lon;
 
-        fetch(prodUrl + '/api/getEarthExplorerData', {
+        fetch(base_url + '/api/getEarthExplorerData', {
             method: "POST",
             body: JSON.stringify({
                 lat: lat,
@@ -298,13 +306,14 @@ class SatelliteDataCollection extends React.Component{
         this.setState({
             gotGoesImage: false,
         })
-        fetch('/api/get_goes_16_image',{
+        fetch(base_url + '/api/get_goes_satellite_image',{
             method: 'POST',
             body: JSON.stringify({
                 year: this.state.goesYear,
                 dayOfYear: this.state.goesDayOfYear,
                 hour: this.state.goesHour,
-                colorComposite: this.state.goesColorComposite
+                colorComposite: this.state.goesColorComposite,
+                imageType: this.state.selectedGoesImageType
             })
         })
         .then(res => res.json())
@@ -319,7 +328,8 @@ class SatelliteDataCollection extends React.Component{
                 this.setState({
                     goesResult: 'success',
                     gotGoesImage: true,
-                    goesUrlRand: Math.floor(Math.random() * 1000000)
+                    goesUrlRand: Math.floor(Math.random() * 1000000),
+                    retrievedGoesImageType: this.state.selectedGoesImageType
                 })
             }
         })
@@ -348,6 +358,12 @@ class SatelliteDataCollection extends React.Component{
         })
     }
 
+    handleGoesImageTypeChange(newType){
+        this.setState({
+            selectedGoesImageType: newType
+        })
+    }
+
     getDayOfYear(date){
         var dateInfo = date.split('-')
         var year = dateInfo[0] 
@@ -372,6 +388,14 @@ class SatelliteDataCollection extends React.Component{
             shadowUrl: require('leaflet/dist/images/marker-shadow.png')
         });
 
+        var goes_url = '/api/'+this.state.goesUrlRand+'/';
+        if(this.state.retrievedGoesImageType == 'GIF'){
+            goes_url += 'goes_satellite.gif'
+        }
+        else{
+            goes_url += 'goes_satellite.png'
+        }
+
         return(
             <div className="jumbotron" style={{margin:'10px 0 50px 0', paddingTop:'20px', overflow:'auto'}}>
                 <FilterDiv 
@@ -391,6 +415,7 @@ class SatelliteDataCollection extends React.Component{
                     handleGoesHourChange = {this.handleGoesHourChange}
                     getGoesData = {this.getGoesData}
                     handleGoesColorCompositeChange = {this.handleGoesColorCompositeChange}
+                    handleGoesImageTypeChange = {this.handleGoesImageTypeChange}
                 />
                 <div>
                     <div>
@@ -410,7 +435,7 @@ class SatelliteDataCollection extends React.Component{
                                     :
                                     this.state.source == 'GOES'?
                                     <div>
-                                        Image for: {this.state.goesYear}, Day {this.state.goesDayOfYear}, Hour {this.state.goesHour}
+                                        Result for: {this.state.goesYear}, Day {this.state.goesDayOfYear}, Hour {this.state.goesHour}
                                         <br/>
                                         <br/>
                                         {
@@ -424,7 +449,7 @@ class SatelliteDataCollection extends React.Component{
                                             <p style={{color: 'red'}}>No image</p>
                                             :
                                             <div>
-                                                <img src={'/api/'+this.state.goesUrlRand+'/goes_16.png'} width='600px' style={{border:'1px solid black'}}/>
+                                                <img src={goes_url} width='600px' style={{border:'1px solid black'}}/>
                                             </div>
                                         }
                                     </div>

@@ -10,8 +10,8 @@ import Plot from 'react-plotly.js';
 import FilterDivModEval from '../Components/FilterDivModEval';
 import counties from '../counties.json';
 
-const devUrl = '';
-const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
+// const devUrl = '';
+// const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
 
 class FireDetectionModEval extends React.Component{
 

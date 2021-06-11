@@ -36,10 +36,10 @@ class DataCollection extends React.Component{
             alert("Geolocation is not supported by this browser.");
         }
         this.setState({
-            weatherComponent: <WeatherDataCollection lat={this.state.lat} lon={this.state.lon}/>,
-            satelliteComponent: <SatelliteDataCollection lat={this.state.lat} lon={this.state.lon}/>,
-            fireHistoryComponent: <FireHistoryDataCollection lat={this.state.lat} lon={this.state.lon}/>,
-            vegetationComponent: <VegetationDataCollection lat={this.state.lat} lon={this.state.lon}/>,
+            weatherComponent: <WeatherDataCollection lat={this.state.lat} lon={this.state.lon} />,
+            satelliteComponent: <SatelliteDataCollection lat={this.state.lat} lon={this.state.lon} />,
+            fireHistoryComponent: <FireHistoryDataCollection lat={this.state.lat} lon={this.state.lon} />,
+            vegetationComponent: <VegetationDataCollection lat={this.state.lat} lon={this.state.lon} />,
             lightningComponent: <LightningDataCollection lat={this.state.lat} lon={this.state.lon} />
         })
     }

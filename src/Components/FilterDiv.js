@@ -27,6 +27,7 @@ class FilterDiv extends React.Component{
         this.changeGoesDate = this.changeGoesDate.bind(this);
         this.changeGoesHour = this.changeGoesHour.bind(this);
         this.changeGoesColorComposite = this.changeGoesColorComposite.bind(this);
+        this.changeGoesImageType = this.changeGoesImageType.bind(this);
 
         // GOES for lightning
         this.changeGoesLightningDate = this.changeGoesLightningDate.bind(this);
@@ -112,6 +113,10 @@ class FilterDiv extends React.Component{
 
     changeGoesColorComposite(event){
         this.props.handleGoesColorCompositeChange(event.target.value)
+    }
+
+    changeGoesImageType(event){
+        this.props.handleGoesImageTypeChange(event.target.value)
     }
     
     render(){
@@ -300,12 +305,12 @@ class FilterDiv extends React.Component{
                             :
                             this.props.dataType == 'satellite' && this.props.dataSource == 'GOES'?
                             <div style={{display:'block', overflow:'auto'}}>
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;
                                 {/* Date: &nbsp;&nbsp; */}
                                 <input type='date' style={{padding:'10px'}} onChange={this.changeGoesDate}/>
 
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                Hour: &nbsp;&nbsp;
+                                &nbsp;&nbsp;
+                                Hour:&nbsp;
                                 <select style={{padding:'14px'}} onChange={this.changeGoesHour}>
                                     <option value='0'>0</option>
                                     <option value='1'>1</option>  
@@ -333,10 +338,16 @@ class FilterDiv extends React.Component{
                                     <option value='23'>23</option>   
                                 </select>
 
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;
                                 <select style={{padding:'14px'}} onChange={this.changeGoesColorComposite}>
                                     <option value='true color composite'>True Color Composite</option>
                                     <option value='false color composite'>False Color Composite</option>
+                                </select>
+
+                                &nbsp;&nbsp;
+                                <select style={{padding:'14px'}} onChange={this.changeGoesImageType}>
+                                    <option value='Image'>Image</option>
+                                    <option value='GIF'>GIF</option>
                                 </select>
 
                                 <button className='btn btn-primary' onClick={this.props.getGoesData} style={{float:'right'}}>Get Data</button>

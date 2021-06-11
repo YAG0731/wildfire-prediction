@@ -12,12 +12,15 @@ const DetectionList = ({ boxes, scores, classes }) => {
 
   const renderedList = fires.map((fire) => {
     return (
-      <DetectionDetail
-        box={fire[0]}
-        score={fire[1]}
-        classification={fire[2]}
-        key={fire[4]}
-      />
+      <div>
+        <DetectionDetail
+          box={fire[0]}
+          score={fire[1]}
+          classification={fire[2]}
+          key={fire[4]}
+        />
+        <br/>
+      </div>
     );
   });
 

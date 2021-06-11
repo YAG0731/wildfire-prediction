@@ -13,21 +13,19 @@ import Progression from './Progression';
 import ModelEvaluation from './ModelEvaluation';
 // import Flask from'./Flask-example';
 
+
 function App() {
   return (
     <BrowserRouter>
-      <Route exact path="/" component={DataCollection}></Route>
-      <Route path="/preprocessing" component={Preprocessing}></Route>
+      <Route exact path='/' component={DataCollection} />
       <Route path="/data-analysis" component={DataAnalysis}></Route>
       <Route path="/detection" component={Monitoring}></Route>
-
-      {/* <Route path="/imageDetection" component={Detection2}></Route> */}
-
       <Route path="/risk" component={Risk}></Route>
       <Route path="/progression" component={Progression}></Route>
       <Route path="/model-evaluation" component={ModelEvaluation}></Route>
       
       {/* <Route path='/flask' component={Flask}></Route> */}
+
     </BrowserRouter>
   );
 }

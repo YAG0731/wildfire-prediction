@@ -9,8 +9,13 @@ import FilterDiv from '../Components/FilterDiv';
 
 import FireIcon from '../images/realistic_fire.png';
 
-const devUrl = '';
-const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
+// const devUrl = '';
+// const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
+
+var base_url = '';
+if(process.env.REACT_APP_ENVIRONMENT === 'prod'){
+    base_url = 'https://wildfire-ml-flask.herokuapp.com'
+}
 
 class LightningDataCollection extends React.Component{
 
@@ -59,7 +64,7 @@ class LightningDataCollection extends React.Component{
             gotGoesImage: false,
         })
 
-        fetch('/api/get_goes_16_lightning_data', {
+        fetch(base_url + '/api/get_goes_16_lightning_data', {
             method: 'POST',
             body: JSON.stringify({
                 year: this.state.goesYear,

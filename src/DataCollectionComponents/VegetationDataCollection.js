@@ -43,6 +43,12 @@ const ncei_ndvi_images = {
     '2020-12-23': ncei_img6
 }
 
+
+var base_url = '';
+if(process.env.REACT_APP_ENVIRONMENT === 'prod'){
+    base_url = 'https://wildfire-ml-flask.herokuapp.com'
+}
+
 class VegetationDataCollection extends React.Component{
 
     constructor(props){
@@ -285,7 +291,7 @@ class VegetationDataCollection extends React.Component{
         }
         
 
-        fetch('/api/get_landsat_ndvi_image',{
+        fetch(base_url + '/api/get_landsat_ndvi_image',{
             method: 'POST',
             body: JSON.stringify({
                 date: this.state.landsatDate,
@@ -376,7 +382,7 @@ class VegetationDataCollection extends React.Component{
             day = '0' + day
         }
         
-        fetch('/api/get_modis_ndvi_image',{
+        fetch(base_url + '/api/get_modis_ndvi_image',{
             method: 'POST',
             body: JSON.stringify({
                 // date: this.state.landsatDate,
@@ -469,7 +475,7 @@ class VegetationDataCollection extends React.Component{
     downloadNdviImage(){
         // console.log('downloading...')
         var rand = Math.floor(Math.random() * 1000000);
-        fetch('/api/'+rand+'/download_ndvi')
+        fetch(base_url + '/api/'+rand+'/download_ndvi')
         .then(res => res.arrayBuffer())
         .then(buffer => {
             // console.log(buffer)
@@ -493,7 +499,7 @@ class VegetationDataCollection extends React.Component{
     //     this.setState({
     //         gotGoesImage: false,
     //     })
-    //     fetch('/api/get_goes_16_image',{
+    //     fetch(base_url + '/api/get_goes_16_image',{
     //         method: 'POST',
     //         body: JSON.stringify({
     //             year: this.state.goesYear,

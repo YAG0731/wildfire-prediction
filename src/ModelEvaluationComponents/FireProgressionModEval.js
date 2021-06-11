@@ -10,8 +10,13 @@ import Plot from 'react-plotly.js';
 import FilterDivModEval from '../Components/FilterDivModEval';
 import counties from '../counties.json';
 
-const devUrl = '';
-const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
+// const devUrl = '';
+// const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
+
+var base_url = ''
+if(process.env.REACT_APP_ENVIRONMENT === 'prod'){
+    base_url = 'https://wildfire-ml-flask.herokuapp.com'
+}
 
 class FireProgressionModEval extends React.Component{
 
@@ -122,7 +127,7 @@ class FireProgressionModEval extends React.Component{
         var lat = this.state.lat;
         var lon = this.state.lon;
 
-        fetch(prodUrl + '/api/getEarthExplorerData', {
+        fetch(base_url + '/api/getEarthExplorerData', {
             method: "POST",
             body: JSON.stringify({
                 lat: lat,

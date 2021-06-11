@@ -15,8 +15,13 @@ var myIcon = L.icon({
 })
 
 
-const devUrl = '';
-const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
+// const devUrl = '';
+// const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
+
+var base_url = ''
+if(process.env.REACT_APP_ENVIRONMENT === 'prod'){
+    base_url = 'https://wildfire-ml-flask.herokuapp.com'
+}
 
 class FireHistoryDataCollection extends React.Component{
 
@@ -120,7 +125,7 @@ class FireHistoryDataCollection extends React.Component{
 
         // var features = ['OBJECTID', 'FIRE_NAME', 'STATE_NAME', 'COUNTY_NAME', 'DISCOVER_YEAR', 'POO_LATITUDE', 'POO_LONGITUDE', 'FIRE_SIZE_CLASS', 'TOTAL_ACRES_BURNED', 'STATION_NAME' ]
 
-        fetch(prodUrl + '/api/getUSDAFireData', {
+        fetch(base_url + '/api/getUSDAFireData', {
             method: "POST",
             body: JSON.stringify({
                 startDate: start,
