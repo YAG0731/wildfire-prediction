@@ -140,6 +140,9 @@ class FilterDiv extends React.Component{
                             this.props.dataType === 'lightning'?
                             'Lightning'
                             :
+                            this.props.dataType === 'powerlines'?
+                            'Powerlines'
+                            :
                             <div></div>
                         }
                     </h4>
@@ -203,8 +206,14 @@ class FilterDiv extends React.Component{
                                 </select>
                                 :
                                 this.props.dataType === 'lightning'?
-                                <select style={{padding:'14px'}}>
+                                <select style={{padding:'14px'}} onChange={this.changeSource}>
                                     <option value='GOES'>GOES-16</option>
+                                </select>
+                                :
+                                this.props.dataType === 'powerlines'?
+                                <select style={{padding:'14px'}} onChange={this.changeSource}>
+                                    <option value='CEC'>CEC</option>
+                                    <option value='HIFLD'>HIFLD</option>
                                 </select>
                                 :
                                 <div></div>
@@ -367,6 +376,9 @@ class FilterDiv extends React.Component{
                                 
                             </div>
                             :
+                            this.props.dataType == 'powerlines'?
+                            <div></div>
+                            :
                             <div>
                                 <div style={{float:'right'}}>
                                     From:&nbsp;
@@ -400,6 +412,9 @@ class FilterDiv extends React.Component{
                         <div></div>
                         :
                         this.props.dataSource == 'GOES' && this.props.dataType == 'lightning'?
+                        <div></div>
+                        :
+                        this.props.dataType == 'powerlines'?
                         <div></div>
                         :
                         <div>

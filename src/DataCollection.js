@@ -6,6 +6,7 @@ import SatelliteDataCollection from './DataCollectionComponents/SatelliteDataCol
 import FireHistoryDataCollection from './DataCollectionComponents/FireHistoryDataCollection';
 import VegetationDataCollection from './DataCollectionComponents/VegetationDataCollection';
 import LightningDataCollection from './DataCollectionComponents/LightningDataCollection';
+import PowerlinesDataCollection from './DataCollectionComponents/PowerlinesDataCollection';
 
 class DataCollection extends React.Component{
 
@@ -21,6 +22,7 @@ class DataCollection extends React.Component{
             fireHistoryComponent: null,
             vegetationComponent: null,
             lightningComponent: null,
+            powerlinesComponent: null,
         }
 
         this.getCoordinates = this.getCoordinates.bind(this);
@@ -40,7 +42,8 @@ class DataCollection extends React.Component{
             satelliteComponent: <SatelliteDataCollection lat={this.state.lat} lon={this.state.lon} />,
             fireHistoryComponent: <FireHistoryDataCollection lat={this.state.lat} lon={this.state.lon} />,
             vegetationComponent: <VegetationDataCollection lat={this.state.lat} lon={this.state.lon} />,
-            lightningComponent: <LightningDataCollection lat={this.state.lat} lon={this.state.lon} />
+            lightningComponent: <LightningDataCollection lat={this.state.lat} lon={this.state.lon} />,
+            powerlinesComponent: <PowerlinesDataCollection lat={this.state.lat} lon={this.state.lon} />
         })
     }
 
@@ -62,24 +65,24 @@ class DataCollection extends React.Component{
     render(){
         var styles = {
             buttonGroupButton: {
-                width: '15%',
+                width: '12%',
                 backgroundColor: '#f0f0f0', 
                 border: '1px solid grey',
-                padding: '10px 24px', 
+                padding: '6px 10px', 
                 float: 'left',
-                margin:'0 20px 0 0',
+                margin:'0 10px 0 0',
                 borderRadius: '20px',
                 color:'black',
                 outline:'none'
             },
             buttonGroupButtonActive: {
-                width: '15%',
+                width: '12%',
                 backgroundColor: '#1580fb', 
                 border: '1px solid #1580fb',
                 color: 'white', 
-                padding: '10px 24px', 
+                padding: '6px 10px', 
                 float: 'left',
-                margin:'0 20px 0 0',
+                margin:'0 10px 0 0',
                 borderRadius:'20px',
                 outline:'none'
             }
@@ -130,6 +133,12 @@ class DataCollection extends React.Component{
                                     :
                                     <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Lightning</button>
                                 }
+                                {
+                                    this.state.currentMode === 'Powerlines'?
+                                    <button style={styles.buttonGroupButtonActive}>Powerlines</button>
+                                    :
+                                    <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Powerlines</button>
+                                }
                             </div>
 
                             {
@@ -159,6 +168,12 @@ class DataCollection extends React.Component{
                             {
                                 this.state.currentMode === 'Lightning'?
                                 this.state.lightningComponent
+                                :
+                                <div></div>
+                            }
+                            {
+                                this.state.currentMode === 'Powerlines'?
+                                this.state.powerlinesComponent
                                 :
                                 <div></div>
                             }

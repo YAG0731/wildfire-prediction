@@ -18,6 +18,7 @@ function App() {
   return (
     <BrowserRouter>
       <Route exact path='/' component={DataCollection} />
+      <Route path='/preprocessing' component={Preprocessing} />
       <Route path="/data-analysis" component={DataAnalysis}></Route>
       <Route path="/detection" component={Monitoring}></Route>
       <Route path="/risk" component={Risk}></Route>
