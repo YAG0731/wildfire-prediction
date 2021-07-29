@@ -5,6 +5,7 @@ import DetectionDetail from './DetectionComponents/DetectionDetail.js';
 import './DetectionComponents/example-fire-detection.png';
 import DetectionList from './DetectionComponents/DetectionList.js';
 import DetectionImage from './DetectionComponents/DetectionImage.js';
+import { ControlledLayer } from 'react-leaflet/lib/LayersControl';
 
 
 class WildfireDetection extends React.Component {
@@ -26,6 +27,8 @@ class WildfireDetection extends React.Component {
       gotInputImage: false,
       detectScoreCompleted: false,
       detectFireCompleted: false,
+      job_id: null,
+      job_done: false,
     };
 
     this.getFile = this.getFile.bind(this)
@@ -52,7 +55,7 @@ class WildfireDetection extends React.Component {
       gotInputImage: false
     })
     var url = 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&&CRS=EPSG:4326&WRAP=DAY&LAYERS='    
-    var height = 800
+    var height = 2000
     if(this.state.imageColor === 'True Color Composite'){
       url += 'MODIS_Terra_CorrectedReflectance_TrueColor'
     }
@@ -101,7 +104,7 @@ class WildfireDetection extends React.Component {
     this.setState({ loading: true });
     this.detectFire();
     // wait 10 seconds to allow detectFire to process
-    setTimeout(() => { this.detectScore(); }, 8000);
+    // setTimeout(() => { this.detectScore(); }, 8000);
 
   }
 
@@ -191,7 +194,8 @@ class WildfireDetection extends React.Component {
   async detectFire() {
     console.log('running detect fire')
     this.setState({
-      detectFireCompleted: false
+      detectFireCompleted: false,
+      loading: true,
     })
 
     const formData = new FormData();
@@ -204,31 +208,50 @@ class WildfireDetection extends React.Component {
     })
     .then(res => {
       // Start loading
-      this.setState({ loading: true });
+      this.setState({ 
+        job_done: false,
+       });
 
-      console.log(res)
+      res.text().then(body => {
+        console.log(body)
+        this.setState({
+          job_id: body
+        }, () => {
+          this.checkJobStatus();
+          this.timerId = setInterval(() => this.checkJobStatus(), 1000)
+        })
 
-      const reader = res.body.getReader();
-      if(!res.ok) {
-        throw Error("Error getting the predict image")
-      }
-      return new ReadableStream({
-        start(controller) {
-          return pump();
-          function pump() {
-            return reader.read().then(({ done, value }) => {
-              // When no more data needs to be consumed, close the stream
-              if (done) {
-                  controller.close();
-                  return;
-              }
-              // Enqueue the next data chunk into our target stream
-              controller.enqueue(value);
-              return pump();
-            });
-          }
-        }
-      })
+        // fetch('https://wpp-fire-detection-ml.herokuapp.com/status/' + body)
+        // .then(res => res.json())
+        // .then(response => {
+        //   console.log(response)
+        //   this.setState({
+        //     job_done: true,
+        //   })
+        // })
+      });
+
+      // const reader = res.body.getReader();
+      // if(!res.ok) {
+      //   throw Error("Error getting the predict image")
+      // }
+      // return new ReadableStream({
+      //   start(controller) {
+      //     return pump();
+      //     function pump() {
+      //       return reader.read().then(({ done, value }) => {
+      //         // When no more data needs to be consumed, close the stream
+      //         if (done) {
+      //             controller.close();
+      //             return;
+      //         }
+      //         // Enqueue the next data chunk into our target stream
+      //         controller.enqueue(value);
+      //         return pump();
+      //       });
+      //     }
+      //   }
+      // })
     })
     .then(stream => new Response(stream))
     .then(response => response.blob())
@@ -248,6 +271,24 @@ class WildfireDetection extends React.Component {
   // Fire Functions
   onFireSelect = (fire) => {
     this.setState({ selectedFire: fire });
+  }
+
+  checkJobStatus(){
+    fetch('https://wpp-fire-detection-ml.herokuapp.com/status/' + this.state.job_id)
+    .then(res => res.json())
+    .then(response => {
+      console.log(response)
+      if('completed' in response){
+        if(response['completed'] == response['total']){
+          console.log('done')
+          clearInterval(this.timerId)
+          this.setState({
+            job_done: true,
+            loading: false,
+          })
+        }
+      }
+    })
   }
 
   render() {
@@ -340,11 +381,18 @@ class WildfireDetection extends React.Component {
                 <div style={{border:'1px solid grey', borderRadius:'10px', padding:'10px', width:'60%', float:'left', marginBottom:'40px'}}>
                   <h5 style={{fontWeight:'bold'}}>Output Image</h5>
                   <hr/>
+
                   {
-                    this.state.loading?
-                    <div>Loading...</div>
+                    this.state.job_id == null?
+                    <div></div>
                     :
-                    <DetectionImage url={this.state.fireImgUrl} loading={this.state.loading} />
+                    this.state.job_done?
+                    <img src={'https://wpp-fire-detection-ml.herokuapp.com/image/' + this.state.job_id} width='100%' />
+                    :
+                    <div>Loading...</div>
+
+                    // <DetectionImage url={this.state.fireImgUrl} loading={this.state.loading} />
+
                   }
                   {/* <DetectionImage url={this.state.fireImgUrl} loading={this.state.loading} /> */}
                 </div>

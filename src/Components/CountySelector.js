@@ -23,7 +23,7 @@ class CountySelector extends React.Component{
                 <option value='Alpine'>Alpine</option>
                 <option value='Amador'>Amador</option>
                 <option value='Butte'>Butte</option>
-                <option value='Calavares'>Calavares</option>
+                <option value='Calaveras'>Calaveras</option>
                 <option value='Contra Costa'>Contra Costa</option>
                 <option value='Del Norte'>Del Norte</option>
                 <option value='El Dorado'>El Dorado</option>
@@ -52,7 +52,7 @@ class CountySelector extends React.Component{
                 <option value='Riverside'>Riverside</option>
                 <option value='Sacramento'>Sacramento</option>
                 <option value='San Benito'>San Benito</option>
-                <option value='San Bernadino'>San Bernadino</option>
+                <option value='San Bernardino'>San Bernardino</option>
                 <option value='San Diego'>San Diego</option>
                 <option value='San Francisco'>San Francisco</option>
                 <option value='San Joaquin'>San Joaquin</option>

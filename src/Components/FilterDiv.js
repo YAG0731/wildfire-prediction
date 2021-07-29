@@ -212,7 +212,6 @@ class FilterDiv extends React.Component{
                                 :
                                 this.props.dataType === 'powerlines'?
                                 <select style={{padding:'14px'}} onChange={this.changeSource}>
-                                    <option value='CEC'>CEC</option>
                                     <option value='HIFLD'>HIFLD</option>
                                 </select>
                                 :
@@ -377,7 +376,11 @@ class FilterDiv extends React.Component{
                             </div>
                             :
                             this.props.dataType == 'powerlines'?
-                            <div></div>
+                            <div>
+                                &nbsp;&nbsp;
+                                County:&nbsp;
+                                <CountySelector parentCallback={this.props.changeCounty} />
+                            </div>
                             :
                             <div>
                                 <div style={{float:'right'}}>
