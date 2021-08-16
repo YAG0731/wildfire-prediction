@@ -2,16 +2,34 @@ import React from 'react';
 import '../css/reactPaginationStyle.css';
 import { MDBDataTable } from 'mdbreact';
 // import CountySelector from '../Components/CountySelector';
-import {Map, TileLayer, LayersControl, Marker, Popup, GeoJSON} from 'react-leaflet';
+import {Map, TileLayer, LayersControl, Marker, GeoJSON, Circle} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import Plot from 'react-plotly.js';
 import FilterDiv from '../Components/FilterDiv';
 import counties from '../counties.json';
+import RealisticFireIcon from '../images/realistic_fire.png'
 
 const devUrl = '';
 const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
+
+// var myIcon = L.icon({
+//     iconUrl: RealisticFireIcon,
+//     iconSize: [30,40],
+// });
+
+var markerColors = {
+    '2013': '#5e5758',
+    '2014': '#db8851',
+    '2015': '#c2af04',
+    '2016': '#68a331',
+    '2017': '#2f6e9e',
+    '2018': '#3142a3',
+    '2019': '#682eb0',
+    '2020': '#ad2da3',
+    '2021': '#eb4d60'
+}
 
 class FireHistoryDataAnalysis extends React.Component{
 
@@ -34,6 +52,20 @@ class FireHistoryDataAnalysis extends React.Component{
                 'Smallest fire': '20 acres',
                 
             },
+            gotBurnAreaVsYearPlot: false,
+            errorGettingBurnAreaVsYearPlot: false,
+            firesByYear: null,
+            fireYearToggles: {},
+            show_2013_fires: false,
+            show_2014_fires: false,
+            show_2015_fires: false,
+            show_2016_fires: false,
+            show_2017_fires: false,
+            show_2018_fires: false,
+            show_2019_fires: false,
+            show_2020_fires: false,
+            show_2021_fires: true,
+            selectedFire: null,
         }
 
         this.formatDate = this.formatDate.bind(this);
@@ -44,7 +76,10 @@ class FireHistoryDataAnalysis extends React.Component{
         this.changeCounty = this.changeCounty.bind(this);
         this.handleStartDateChange = this.handleStartDateChange.bind(this);
         this.handleEndDateChange = this.handleEndDateChange.bind(this);
-
+        this.getBurnAreaVsYearPlot = this.getBurnAreaVsYearPlot.bind(this);
+        this.getFireIncidentByYear = this.getFireIncidentByYear.bind(this);
+        this.fireYearToggles = this.fireYearToggles.bind(this);
+        this.setCurrentFire = this.setCurrentFire.bind(this);
     }
 
     componentDidMount(){
@@ -76,7 +111,9 @@ class FireHistoryDataAnalysis extends React.Component{
             endDate: today,
         })
 
-        this.getUSDAFireData(yearAgo, today);
+        // this.getUSDAFireData(yearAgo, today);
+        this.getBurnAreaVsYearPlot();
+        this.getFireIncidentByYear();
     }
 
     formatDate(date) {
@@ -120,6 +157,41 @@ class FireHistoryDataAnalysis extends React.Component{
         }
 
     }
+
+    getBurnAreaVsYearPlot(){
+        fetch('/api/get_burn_area_vs_year_plot', {
+            method: 'POST',
+            body: JSON.stringify({
+                test: 'test',
+            })
+        })
+        .then(res => res.json())
+        .then(response => {
+            if(response['result'] == 'success'){
+                this.setState({
+                    gotBurnAreaVsYearPlot: true,
+                    errorGettingBurnAreaVsYearPlot: false,
+                })
+            }
+            else{
+                this.setState({
+                    gotBurnAreaVsYearPlot: true,
+                    errorGettingBurnAreaVsYearPlot: true,
+                })
+            }
+        })
+    }
+
+    getFireIncidentByYear(){
+        fetch('/api/get_fire_incident_by_year')
+        .then(res => res.json())
+        .then(response => {
+            this.setState({
+                firesByYear: response['result']
+            })
+        })
+    }
+
 
     getUSDAFireData(start, end){
         var lat = this.state.lat;
@@ -217,6 +289,79 @@ class FireHistoryDataAnalysis extends React.Component{
         })
     }
 
+    fireYearToggles(){
+        return(
+            <div style={{border:'1px solid grey', padding:'10px'}}>
+                <div style={{background: markerColors['2013'], borderRadius:'50%', width:'12px', height:'12px', display:'inline-block'}}></div>&nbsp;
+                2013 &nbsp;
+                <input type='checkbox' checked={this.state.show_2013_fires} onChange={(e) => {this.setState({show_2013_fires: !this.state.show_2013_fires})}}/>
+                <br/>
+
+                <div style={{background: markerColors['2014'], borderRadius:'50%', width:'12px', height:'12px', display:'inline-block'}}></div>&nbsp;
+                2014 &nbsp;
+                <input type='checkbox' checked={this.state.show_2014_fires} onChange={(e) => {this.setState({show_2014_fires: !this.state.show_2014_fires})}}/>
+                <br/>
+
+                <div style={{background: markerColors['2015'], borderRadius:'50%', width:'12px', height:'12px', display:'inline-block'}}></div>&nbsp;
+                2015 &nbsp;
+                <input type='checkbox' checked={this.state.show_2015_fires} onChange={(e) => {this.setState({show_2015_fires: !this.state.show_2015_fires})}}/>
+                <br/>
+
+                <div style={{background: markerColors['2016'], borderRadius:'50%', width:'12px', height:'12px', display:'inline-block'}}></div>&nbsp;
+                2016 &nbsp;
+                <input type='checkbox' checked={this.state.show_2016_fires} onChange={(e) => {this.setState({show_2016_fires: !this.state.show_2016_fires})}}/>
+                <br/>
+
+                <div style={{background: markerColors['2017'], borderRadius:'50%', width:'12px', height:'12px', display:'inline-block'}}></div>&nbsp;
+                2017 &nbsp;
+                <input type='checkbox' checked={this.state.show_2017_fires} onChange={(e) => {this.setState({show_2017_fires: !this.state.show_2017_fires})}}/>
+                <br/>
+
+                <div style={{background: markerColors['2018'], borderRadius:'50%', width:'12px', height:'12px', display:'inline-block'}}></div>&nbsp;
+                2018 &nbsp;
+                <input type='checkbox' checked={this.state.show_2018_fires} onChange={(e) => {this.setState({show_2018_fires: !this.state.show_2018_fires})}}/>
+                <br/>
+
+                <div style={{background: markerColors['2019'], borderRadius:'50%', width:'12px', height:'12px', display:'inline-block'}}></div>&nbsp;
+                2019 &nbsp;
+                <input type='checkbox' checked={this.state.show_2019_fires} onChange={(e) => {this.setState({show_2019_fires: !this.state.show_2019_fires})}}/>
+                <br/>
+
+                <div style={{background: markerColors['2020'], borderRadius:'50%', width:'12px', height:'12px', display:'inline-block'}}></div>&nbsp;
+                2020 &nbsp;
+                <input type='checkbox' checked={this.state.show_2020_fires} onChange={(e) => {this.setState({show_2020_fires: !this.state.show_2020_fires})}}/>
+                <br/>
+
+                <div style={{background: markerColors['2021'], borderRadius:'50%', width:'12px', height:'12px', display:'inline-block'}}></div>&nbsp;
+                2021 &nbsp;
+                <input type='checkbox' checked={this.state.show_2021_fires} onChange={(e) => {this.setState({show_2021_fires: !this.state.show_2021_fires})}}/>
+                <br/>
+
+            </div>
+        )
+    }
+
+    makeMarkers(year, color){
+        var markers = []
+        var data = this.state.firesByYear[year]
+
+        var radius_scaling = 50;
+        for(var i=0; i<data.length; i++){
+            var fire = data[i]
+            markers.push(
+                // <Marker position={[fire['incident_latitude'], fire['incident_longitude']]} key={i} onClick={this.setCurrentFire.bind(this, fire)} icon={myIcon} />
+                <Circle center={[fire['incident_latitude'], fire['incident_longitude']]} color={color} fillColor={color} radius={Math.sqrt(fire['incident_acres_burned']) * radius_scaling} key={i} onClick={this.setCurrentFire.bind(this, fire)} />
+            )
+        }
+        return markers
+    }
+
+    setCurrentFire(fire){
+        this.setState({
+            selectedFire: fire
+        })
+    }
+
 
     render(){
         delete L.Icon.Default.prototype._getIconUrl;
@@ -248,37 +393,28 @@ class FireHistoryDataAnalysis extends React.Component{
                     handleEndDateChange={this.handleEndDateChange}
                 />
 
-                <p>
+                {/* <p>
                     <strong>Data for: </strong>{this.state.currentCounty} County ({this.state.startDate} to {this.state.endDate})
                 </p>
-                <hr/>
+                <hr/> */}
                 <div>
                     {
                         this.state.currentView === 'Statistic View'?
                         <div>
-                            <h3>Important statistics:</h3>
-                            <br/>
-                            <div style={{display:'flex', flexWrap:'wrap'}}>
-                                {
-                                    Object.keys(this.state.summaryData).map(
-                                        key => {
-                                            return (
-                                                <div key={key} style={{margin:'6px 24px 6px 0'}}>
-                                                    <strong>{key}: </strong>{this.state.summaryData[key]}
-                                                </div>
-                                            )
-                                        }
-                                    )
-                                }
-                            </div>
-                            <hr/>
-
-                            <img src='https://www.nctrails.org/sites/default/files/Fire-Causes-Graph.png' alt='fire' width='60%' style={{margin:'20px 0'}}/>
-                            <img src='https://akfireinfo.files.wordpress.com/2015/07/jun30acreage.png' alt='fire2' width='100%' style={{margin:'20px 0'}} />
+                            <h4>Incident Burn Area vs Year</h4>
+                            {
+                                this.state.gotBurnAreaVsYearPlot?
+                                this.state.errorGettingBurnAreaVsYearPlot?
+                                <p style={{color:'red'}}>Something went wrong.</p>
+                                :
+                                <img src={'/api/'+(Math.floor(Math.random()*1000000))+'/burn_area_vs_year_plot.png'} width='60%' />
+                                :
+                                <div>Loading...</div>
+                            }
                         </div>
                         :
                         <div>
-                            <Map style={{height:'calc(100vh - 200px)', width:'calc(100vw - 600px)', border:'1px solid black', float:'left'}} zoom={6} center={[this.state.lat, this.state.lon]}>
+                            <Map style={{height:'calc(100vh - 200px)', width:'calc(100vw - 600px)', border:'1px solid black', float:'left'}} zoom={8} center={[this.state.lat, this.state.lon]}>
                                 <LayersControl position="topright">
 
                                     <LayersControl.BaseLayer name="Topology" checked>
@@ -320,32 +456,96 @@ class FireHistoryDataAnalysis extends React.Component{
                                         <GeoJSON data={counties.features}  style={countyStyle} onEachFeature={this.onEachCounty}/>
                                     </LayersControl.Overlay>
 
+                                    {
+                                        this.state.show_2013_fires?
+                                        this.makeMarkers('2013', markerColors['2013'])
+                                        :
+                                        <div></div>
+                                    }
+                                    {
+                                        this.state.show_2014_fires?
+                                        this.makeMarkers('2014', markerColors['2014'])
+                                        :
+                                        <div></div>
+                                    }
+                                    {
+                                        this.state.show_2015_fires?
+                                        this.makeMarkers('2015', markerColors['2015'])
+                                        :
+                                        <div></div>
+                                    }
+                                    {
+                                        this.state.show_2016_fires?
+                                        this.makeMarkers('2016', markerColors['2016'])
+                                        :
+                                        <div></div>
+                                    }
+                                    {
+                                        this.state.show_2017_fires?
+                                        this.makeMarkers('2017', markerColors['2017'])
+                                        :
+                                        <div></div>
+                                    }
+                                    {
+                                        this.state.show_2018_fires?
+                                        this.makeMarkers('2018', markerColors['2018'])
+                                        :
+                                        <div></div>
+                                    }
+                                    {
+                                        this.state.show_2019_fires?
+                                        this.makeMarkers('2019', markerColors['2019'])
+                                        :
+                                        <div></div>
+                                    }
+                                    {
+                                        this.state.show_2020_fires?
+                                        this.makeMarkers('2020', markerColors['2020'])
+                                        :
+                                        <div></div>
+                                    }
+                                    {
+                                        this.state.show_2021_fires?
+                                        this.makeMarkers('2021', markerColors['2021'])
+                                        :
+                                        <div></div>
+                                    }
+
                                 </LayersControl>
                             </Map>
 
                             <div style={{float:'right', padding:'6px', width:'230px'}}>
                             {
-                                this.state.summaryData == null?
-                                <p>Important statistics:</p>
+                                this.state.firesByYear == null?
+                                <div>Loading...</div>
                                 :
                                 <div>
-                                    <p>Important statistics:</p>
+                                    {this.fireYearToggles()}
                                     <hr/>
-                                    <div style={{display:'flex', flexWrap:'wrap'}}>
-                                        {
-                                            Object.keys(this.state.summaryData).map(
-                                                key => {
-                                                    return (
-                                                        <div key={key} style={{margin:'4px 0'}}>
-                                                            <strong>{key}: </strong>{this.state.summaryData[key]}
-                                                        </div>
-                                                    )
-                                                }
-                                            )
-                                        }
-                                    </div>
+                                    {
+                                        this.state.selectedFire == null?
+                                        <div></div>
+                                        :
+                                        <div>
+                                            <strong>Name: </strong>{this.state.selectedFire['incident_name']}
+                                            <br/>
+                                            <strong>County: </strong>{this.state.selectedFire['incident_county']}
+                                            <br/>
+                                            <strong>Date: </strong>{this.state.selectedFire['incident_date_created']}
+                                            <br/>
+                                            <strong>Lat: </strong>{this.state.selectedFire['incident_latitude']}
+                                            <br/>
+                                            <strong>Lon: </strong>{this.state.selectedFire['incident_longitude']}
+                                            <br/>
+                                            <strong>Acres burned: </strong>{this.state.selectedFire['incident_acres_burned']}
+                                            <br/>
+                                        </div>
+                                    }
                                 </div>
                             }
+
+
+                            
                             </div>
 
                         </div>
