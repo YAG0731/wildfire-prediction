@@ -53,7 +53,7 @@
     ]
   },
   "engines":{
-    "name": "example-app",
+    "name": "wildfire-ml-flask",
     "description": "a really cool app",
     "version": "1.0.0",
     "engines": {
