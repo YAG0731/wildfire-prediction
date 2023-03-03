@@ -5,8 +5,8 @@ import WeatherDataCollection from './DataCollectionComponents/WeatherDataCollect
 import SatelliteDataCollection from './DataCollectionComponents/SatelliteDataCollection';
 import FireHistoryDataCollection from './DataCollectionComponents/FireHistoryDataCollection';
 import VegetationDataCollection from './DataCollectionComponents/VegetationDataCollection';
-import LightningDataCollection from './DataCollectionComponents/LightningDataCollection';
-import PowerlinesDataCollection from './DataCollectionComponents/PowerlinesDataCollection';
+import ElevationDataCollection from './DataCollectionComponents/ElevationDataCollection';
+
 
 class DataCollection extends React.Component{
 
@@ -21,8 +21,7 @@ class DataCollection extends React.Component{
             satelliteComponent: null,
             fireHistoryComponent: null,
             vegetationComponent: null,
-            lightningComponent: null,
-            powerlinesComponent: null,
+            elevationComponent: null,
         }
 
         this.getCoordinates = this.getCoordinates.bind(this);
@@ -42,8 +41,7 @@ class DataCollection extends React.Component{
             satelliteComponent: <SatelliteDataCollection lat={this.state.lat} lon={this.state.lon} />,
             fireHistoryComponent: <FireHistoryDataCollection lat={this.state.lat} lon={this.state.lon} />,
             vegetationComponent: <VegetationDataCollection lat={this.state.lat} lon={this.state.lon} />,
-            lightningComponent: <LightningDataCollection lat={this.state.lat} lon={this.state.lon} />,
-            powerlinesComponent: <PowerlinesDataCollection lat={this.state.lat} lon={this.state.lon} />
+            elevationComponent: <ElevationDataCollection lat={this.state.lat} lon={this.state.lon} />
         })
     }
 
@@ -128,16 +126,10 @@ class DataCollection extends React.Component{
                                     <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Satellite</button>
                                 }
                                 {
-                                    this.state.currentMode === 'Lightning'?
-                                    <button style={styles.buttonGroupButtonActive}>Lightning</button>
+                                    this.state.currentMode === 'Elevation'?
+                                    <button style={styles.buttonGroupButtonActive}>elevation</button>
                                     :
-                                    <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Lightning</button>
-                                }
-                                {
-                                    this.state.currentMode === 'Powerlines'?
-                                    <button style={styles.buttonGroupButtonActive}>Powerlines</button>
-                                    :
-                                    <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Powerlines</button>
+                                    <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Elevation</button>
                                 }
                             </div>
 
@@ -166,8 +158,8 @@ class DataCollection extends React.Component{
                                 <div></div>
                             }
                             {
-                                this.state.currentMode === 'Lightning'?
-                                this.state.lightningComponent
+                                this.state.currentMode === 'Elevation'?
+                                this.state.elevationComponent
                                 :
                                 <div></div>
                             }
