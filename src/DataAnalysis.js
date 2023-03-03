@@ -5,7 +5,7 @@ import WeatherDataAnalysis from './DataAnalysisComponents/WeatherDataAnalysis';
 import FireHistoryDataAnalysis from './DataAnalysisComponents/FireHistoryDataAnalysis';
 import VegetationDataAnalysis from './DataAnalysisComponents/VegetationDataAnalysis';
 import SatelliteDataAnalysis from './DataAnalysisComponents/SatelliteDataAnalysis';
-import LightningDataCollection from './DataCollectionComponents/LightningDataCollection';
+import ElevationDataCollection from './DataCollectionComponents/ElevationDataCollection';
 
 class DataAnalysis extends React.Component{
 
@@ -20,7 +20,7 @@ class DataAnalysis extends React.Component{
             satelliteComponent: null,
             fireHistoryComponent: null,
             vegetationComponent: null,
-            lightningComponent: null,
+            elevationComponent: null,
         }
 
         this.getCoordinates = this.getCoordinates.bind(this);
@@ -39,7 +39,7 @@ class DataAnalysis extends React.Component{
             fireHistoryComponent: <FireHistoryDataAnalysis lat={this.state.lat} lon={this.state.lon} />,
             vegetationComponent: <VegetationDataAnalysis lat={this.state.lat} lon={this.state.lon} />,
             satelliteComponent: <SatelliteDataAnalysis lat={this.state.lat} lon={this.state.lon} />,
-            lightningComponent: <LightningDataCollection lat={this.state.lat} lon={this.state.lon} />
+            elevationComponent: <ElevationDataCollection lat={this.state.lat} lon={this.state.lon} />
         })
     }
 
@@ -125,10 +125,10 @@ class DataAnalysis extends React.Component{
                                     <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Satellite</button>
                                 }
                                 {
-                                    this.state.currentMode === 'Lightning'?
-                                    <button style={styles.buttonGroupButtonActive}>Lightning</button>
+                                    this.state.currentMode === 'Elevation'?
+                                    <button style={styles.buttonGroupButtonActive}>elevation</button>
                                     :
-                                    <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Lightning</button>
+                                    <button style={styles.buttonGroupButton} onClick={this.handleModeChange}>Elevation</button>
                                 }
                             </div>
 
@@ -157,8 +157,8 @@ class DataAnalysis extends React.Component{
                                 <div></div>
                             }
                             {
-                                this.state.currentMode === 'Lightning'?
-                                this.state.lightningComponent
+                                this.state.currentMode === 'Elevation'?
+                                this.state.elevationComponent
                                 :
                                 <div></div>
                             }
