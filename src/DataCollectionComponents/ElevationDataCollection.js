@@ -17,7 +17,7 @@ if(process.env.REACT_APP_ENVIRONMENT === 'prod'){
     base_url = 'https://wildfire-ml-flask.herokuapp.com'
 }
 
-class LightningDataCollection extends React.Component{
+class ElevationDataCollection extends React.Component{
 
     constructor(props){
         super(props);
@@ -155,4 +155,4 @@ class LightningDataCollection extends React.Component{
     }
 }
 
-export default LightningDataCollection;
+export default ElevationDataCollection;
