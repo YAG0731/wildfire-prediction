@@ -9,7 +9,9 @@ import MarkerClusterGroup from "react-leaflet-markercluster";
 import Plot from 'react-plotly.js';
 import FilterDiv from '../Components/FilterDiv';
 import counties from '../counties.json';
-
+import weatherImage from './analysis_images/weather_analysis1.png';
+import ink_temp from './analysis_images/weather_temp_ink.png';
+import kincade_temp from './analysis_images/weather_temp_kincade.png';
 const devUrl = '';
 const prodUrl = 'https://wildfire-ml-flask.herokuapp.com';
 
@@ -20,7 +22,7 @@ class WeatherDataCollection extends React.Component{
         
         this.state = {
             source: 'NOAA',
-            currentCounty: 'Alameda',
+            currentCounty: 'Sonoma',
             lat: props.lat,
             lon: props.lon,
             data: null,
@@ -28,7 +30,7 @@ class WeatherDataCollection extends React.Component{
             startDate: null,
             endDate: null,
             summaryData: {
-                'Avg temp': '78.6 F',
+                'Avg temp': '47.59 F',
                 'Lowest temp': '46.9 F',
                 'Highest temp': '99.3 F',
                 'Avg windspeed': '9 mph',
@@ -273,8 +275,9 @@ class WeatherDataCollection extends React.Component{
                             </div>
                             <hr/>
 
-                            <img src='https://eldoradoweather.com/current/climate/images/San%20Diego.png' alt='weather' width='45%' style={{margin:'20px 0'}}/>
-                            <img src='https://www.westjet.com/vacations/img/destinations/en-weather-charts/United-States-Hawaii/SAN-San-Diego_weather-chart.gif' alt='weather2' height='300px' style={{margin:'20px 0'}} />
+                            <img src= {weatherImage} alt='weather' width='45%' style={{margin:'20px 0'}}/>
+                            <img src={ink_temp} width='45%' style={{margin:'200px 0'}}/>
+                            <img src={kincade_temp} alt='weather' width='45%' style={{margin:'200px 0'}}/>
                         </div>
                         :
                         <div>

@@ -25,7 +25,7 @@ class FireProgressionModEval extends React.Component{
         
         this.state = {
             source: 'USGS',
-            currentCounty: 'San Diego',
+            currentCounty: 'Sonoma',
             lat: props.lat,
             lon: props.lon,
             data: null,

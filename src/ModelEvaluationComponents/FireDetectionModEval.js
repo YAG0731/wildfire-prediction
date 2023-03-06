@@ -20,7 +20,7 @@ class FireDetectionModEval extends React.Component{
         
         this.state = {
             source: 'NOAA',
-            currentCounty: 'San Diego',
+            currentCounty: 'Sonoma',
             lat: props.lat,
             lon: props.lon,
             data: null,
@@ -29,9 +29,9 @@ class FireDetectionModEval extends React.Component{
             endDate: null,
             summaryData: {
                 'Satellite Image Source': 'Landsat 8',
-                'Tensorflow Model Version': 'Faster RCNN v2.1',
+                'Tensorflow Model Version': 'YOLO-V5',
                 'Fire  Detected': 'YES',
-                'Confidence Level': '97%',
+                'Confidence Level': '92%',
             },
         }
 
@@ -94,7 +94,7 @@ class FireDetectionModEval extends React.Component{
     getData2(){
         <div style={{width:'100%', height:'50px'}}>
             console.log("getData2")
-            <img src={process.env.PUBLIC_URL + 'images/fireDetection_San_Diego.png'} alt='fire' width='60%' style={{margin:'20px 0'}}/>
+            <img src={process.env.PUBLIC_URL + 'images/detection_yolo1.png'} alt='fire' width='60%' style={{margin:'20px 0'}}/>
         </div>
     }
 
@@ -192,9 +192,8 @@ class FireDetectionModEval extends React.Component{
                             </div>
                             <hr/>
 
-                            <img src={process.env.PUBLIC_URL + 'images/fireDetection_San_Diego.png'} alt='fire' width='45%' style={{margin:'20px 0'}}/>
-                            <img src={process.env.PUBLIC_URL + 'images/fire-prediction.png'} alt='fire' width='30%' style={{margin:'20px 0'}}/>
-                            <img src={process.env.PUBLIC_URL + 'images/fire-precision-recall.png'} alt='fire' width='70%' style={{margin:'20px 0'}}/>
+                            <img src={process.env.PUBLIC_URL + 'images/detection_yolo1.png'} alt='fire' width='45%' style={{margin:'20px 0'}}/>
+           
                         </div>
                         :
                         <div>
