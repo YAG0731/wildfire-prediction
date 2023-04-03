@@ -21,7 +21,7 @@ class WildfireDetection extends React.Component {
       selectedFile: null,
       loading: false,
       inputFileUrl: null,
-      area: 'North California',
+      area: 'what',
       imageColor: 'True Color Composite',
       date: null,
       gotInputImage: false,
